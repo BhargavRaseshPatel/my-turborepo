@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id       String @id @default(uuid())
+  username String
+  password String
+  email    String
+
+  // Relations
+  organizations Organization[] @relation("OrganizationAdmin")
+  memberships   Members[]
+  issueMappings IssueMapping[]
+}
+
+model Organization {
+  id          String @id @default(uuid())
+  name        String
+  description String
+  adminId     String
+
+  // Relations
+  admin   User      @relation("OrganizationAdmin", fields: [adminId], references: [id])
+  members Members[]
+  boards  Board[]
+}
+
+model Members {
+  id     String @id @default(uuid())
+  userId String
+  orgId  String
+  role   String
+
+  // Relations
+  user         User         @relation(fields: [userId], references: [id])
+  organization Organization @relation(fields: [orgId], references: [id])
+
+  @@unique([userId, orgId])
+}
+
+model Board {
+  id             String @id @default(uuid())
+  name           String
+  organizationId String
+
+  // Relations
+  organization Organization @relation(fields: [organizationId], references: [id])
+  sections     Section[]
+  issues       Issue[]
+}
+
+model Section {
+  id      String @id @default(uuid())
+  title   String
+  boardId String
+
+  // Relations
+  board  Board   @relation(fields: [boardId], references: [id])
+  issues Issue[]
+}
+
+model Issue {
+  id          String @id @default(uuid())
+  name        String
+  description String
+  boardId     String
+  sectionId   String
+
+  // Relations
+  board         Board          @relation(fields: [boardId], references: [id])
+  section       Section        @relation(fields: [sectionId], references: [id])
+  issueMappings IssueMapping[]
+  comments      Comments[]
+}
+
+model IssueMapping {
+  id      String @id @default(uuid())
+  userId  String
+  issueId String
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id])
+  issue Issue @relation(fields: [issueId], references: [id])
+
+  @@unique([userId, issueId])
+}
+
+model Comments {
+  id      String   @id @default(uuid())
+  issueId String
+  details String
+  date    DateTime @default(now())
+
+  // Relations
+  issue Issue @relation(fields: [issueId], references: [id])
+}
