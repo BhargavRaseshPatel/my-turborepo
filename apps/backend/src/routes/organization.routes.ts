@@ -1,9 +1,10 @@
 import { Router } from 'express';
+import { createOrganization } from '../controllers/organization.controller';
+import { authMiddleware } from '../utils/middleware';
 
+const router = Router();
 
-const router =await Router();
-
-router.post("/createOrg");
+router.post('/createOrg', authMiddleware, createOrganization);
 
 export default router;
 

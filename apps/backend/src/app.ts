@@ -1,9 +1,34 @@
-import express from 'express'
-import userRoute from './routes/user.routes'
+
+import express from "express";
+import cors from "cors";
+
+import userRoute from "./routes/user.routes";
+import organizationRoute from "./routes/organization.routes";
+import issueRoute from "./routes/issues.routes";
+import boardRoute from "./routes/boards.routes";
 
 const app = express();
 
-app.use(express.json());
-app.use("/", userRoute)
+// Middleware
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 
-export default app
+app.use(express.json());
+
+// API routes
+app.use("/api/auth", userRoute);
+app.use("/api/organizations", organizationRoute);
+app.use("/api/issues", issueRoute);
+app.use("/api/boards", boardRoute);
+
+// Health check
+app.get("/api/health", (_req, res) => {
+  res.status(200).json({
+    message: "Backend is running",
+  });
+});
+
+export default app;

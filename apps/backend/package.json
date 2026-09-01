@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "start": "tsx --env-file=.env --env-file=../../packages/db/.env src/server.ts",
+    "dev": "tsx --watch --env-file=.env --env-file=../../packages/db/.env src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -10,13 +12,16 @@
   "description": "",
   "dependencies": {
     "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
     "db": "*",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3"
   },
   "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.10"
+    "@types/jsonwebtoken": "^9.0.10",
+    "tsx": "^4.23.13"
   }
 }
