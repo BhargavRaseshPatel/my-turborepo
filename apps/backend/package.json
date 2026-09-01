@@ -9,8 +9,10 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
-    "express": "^5.2.1",
-    "db" : "*"
+    "bcrypt": "^6.0.0",
+    "db": "*",
+    "express": "^5.2.1"
   }
 }
