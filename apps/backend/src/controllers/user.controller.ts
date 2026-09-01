@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { loginUser, createUserService } from "../services";
+import { generateToken } from "../utils/jwt";
 
 export const getUser = async (req: Request, res: Response) => {
     const { email, password } = req.body
@@ -11,8 +12,11 @@ export const getUser = async (req: Request, res: Response) => {
         })
     }
 
+    const token = generateToken(user.id)
+    
+
     return res.status(200).json({
-        message : "Login Successful", user
+        message : "Login Successful", token
     })
 }
 
@@ -32,13 +36,11 @@ export const createUser = async (req: Request, res: Response) => {
       username,
     });
 
+    const token = generateToken(user.id)
+
     return res.status(201).json({
       message: "User created successfully",
-      user: {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-      },
+      token
     });
   } catch (error) {
     console.error(error);
