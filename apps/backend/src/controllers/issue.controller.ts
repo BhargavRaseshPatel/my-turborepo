@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { createIssueService, getIssuesService } from "../services/issue.service";
 export const createIssue = async (req: Request, res: Response) => {
     try {
-        const { name, description, boardId } = req.body;
+        const { name, description, boardId, status } = req.body;
         if (!name || !description || !boardId) {
             return res.status(400).json({
                 message: "Name, description, and boardId are required",
@@ -13,10 +13,11 @@ export const createIssue = async (req: Request, res: Response) => {
             name,
             description,
             boardId,
+            status,
         });
         return res.status(201).json({
             message: "Issue created successfully",
-            issue, 
+            issue,
         });
     }
     catch (error) {

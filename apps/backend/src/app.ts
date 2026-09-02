@@ -18,7 +18,15 @@ app.use(
 
 app.use(express.json());
 
+
+
 // API routes
+
+app.get("/", (_req, res) => {
+  res.json({
+    message: "Server is running",
+  });
+});
 app.use("/api/auth", userRoute);
 app.use("/api/organizations", organizationRoute);
 app.use("/api/issues", issueRoute);

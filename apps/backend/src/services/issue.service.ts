@@ -1,15 +1,29 @@
 import { prisma } from "db/client";
 
+type IssueStatus = "UPCOMING" | "IN_PROGRESS" | "DONE";
+
 type CreateIssueInput = {
   name: string;
   description: string;
   boardId: string;
+  status?: string;
+};
+
+const normalizeIssueStatus = (status?: string): IssueStatus => {
+  const normalizedStatus = status?.trim().toUpperCase();
+
+  if (normalizedStatus === "IN_PROGRESS" || normalizedStatus === "DONE" || normalizedStatus === "UPCOMING") {
+    return normalizedStatus as IssueStatus;
+  }
+
+  return "UPCOMING";
 };
 
 export const createIssueService = async ({
   name,
   description,
   boardId,
+  status,
 }: CreateIssueInput) => {
   const board = await prisma.board.findUnique({
     where: {
@@ -26,7 +40,7 @@ export const createIssueService = async ({
       name,
       description,
       boardId,
-      status: "UPCOMING",
+      status: normalizeIssueStatus(status),
     },
   });
 };
