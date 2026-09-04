@@ -1,6 +1,7 @@
 
 import app from "./app";
 import { API_PORT } from "@repo/config";
+import 'dotenv/config';
 
 const PORT = Number(process.env.PORT) || API_PORT;
 

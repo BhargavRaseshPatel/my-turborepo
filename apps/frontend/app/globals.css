@@ -979,6 +979,42 @@ input {
   line-height: 1.5;
 }
 
+.issue-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.issue-move-button {
+  width: 30px;
+  height: 28px;
+  border: 1px solid #dbe1ef;
+  border-radius: 7px;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.issue-move-button:hover:not(:disabled) {
+  border-color: #93c5fd;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.issue-move-button:focus-visible {
+  outline: 2px solid rgba(37, 99, 235, 0.45);
+  outline-offset: 2px;
+}
+
+.issue-move-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
 .board-page .empty-state {
   border: 1px dashed #d1d5db;
   border-radius: 12px;
