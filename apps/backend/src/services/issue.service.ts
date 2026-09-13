@@ -62,3 +62,24 @@ export const getIssuesService = async (boardId: string) => {
     },
   });
 };
+
+export const updateIssueStatusService = async (issueId: string, status: IssueStatus) => {
+  const issue = await prisma.issue.findUnique({
+    where: {
+      id: issueId,
+    },
+  });
+
+  if (!issue) {
+    throw new Error("Issue not found");
+  }
+
+  return prisma.issue.update({
+    where: {
+      id: issueId,
+    },
+    data: {
+      status,
+    },
+  });
+};

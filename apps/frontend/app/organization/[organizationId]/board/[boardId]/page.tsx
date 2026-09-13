@@ -52,6 +52,11 @@ export default function OrganizationBoardPage({ params }: BoardDetailPageProps) 
         return token ? { Authorization: `Bearer ${token}` } : {};
     };
 
+    // send() throws while the socket is still connecting, so skip until it is open
+    const broadcast = (message: object) => {
+        if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify(message));
+    };
+
     useEffect(() => {
         const loadContext = async () => {
             try {
@@ -128,7 +133,10 @@ export default function OrganizationBoardPage({ params }: BoardDetailPageProps) 
             // }))
 
             if (type == 'add_issue') {
-                setIssues((prev) => ([...prev, { id: issueId , name, description, status,boardId}]))
+                // the creator already added it locally, so ignore the echo
+                setIssues((prev) => prev.some((issue) => issue.id === issueId)
+                    ? prev
+                    : [...prev, { id: issueId, name, description, status, boardId }])
             }
 
             console.log(data, "ISSUE", issues)
@@ -137,21 +145,29 @@ export default function OrganizationBoardPage({ params }: BoardDetailPageProps) 
 
     }, [])
 
-    const moveIssue = (issueId: string, status: IssueStatus, direction: 'left' | 'right') => {
+    const moveIssue = async (issueId: string, status: IssueStatus, direction: 'left' | 'right') => {
         const currentIndex = statusOrder.indexOf(status);
         const nextIndex = direction === 'left' ? currentIndex - 1 : currentIndex + 1;
         const nextStatus = statusOrder[nextIndex];
 
         if (!nextStatus) return;
 
-        ws?.send(JSON.stringify({
-            type: 'issue_move',
-            issueId,
-            status,
-            direction,
-            boardId
-        }))
+        const setStatus = (value: IssueStatus) =>
+            setIssues((prev) => prev.map((issue) => issue.id === issueId ? { ...issue, status: value } : issue));
 
+        setStatus(nextStatus);
+        try {
+            const response = await fetch(`${ISSUE_API.base}/${issueId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', ...requestHeaders() },
+                body: JSON.stringify({ status: nextStatus }),
+            });
+            if (!response.ok) throw new Error('Failed to save issue status');
+            broadcast({ type: 'issue_move', issueId, status, direction, boardId });
+        } catch (error) {
+            console.error('Could not move issue:', error);
+            setStatus(status);
+        }
     };
 
 
@@ -176,10 +192,7 @@ export default function OrganizationBoardPage({ params }: BoardDetailPageProps) 
             };
             setIssues((current) => [createdIssue, ...current]);
 
-            ws?.send(JSON.stringify({
-                type: 'add_issue',
-                createdIssue, issueId: createdIssue.id
-            }))
+            broadcast({ type: 'add_issue', createdIssue, issueId: createdIssue.id });
             setFormData({ name: '', description: '', status: 'UPCOMING' });
             setIsIssueFormOpen(false);
         } catch (error) {
