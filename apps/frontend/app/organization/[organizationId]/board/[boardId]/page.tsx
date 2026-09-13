@@ -1,7 +1,7 @@
 'use client';
 
 import { use, useEffect, useMemo, useState } from 'react';
-import { BOARD_API, ISSUE_API, ORG_API } from '@repo/config';
+import { BOARD_API, ISSUE_API, ORG_API, WS_URL } from '@repo/config';
 import { BoardHeader, type BoardOption } from '../../../../../components/board-header';
 import { IssueCreateForm, type IssueFormData } from '../../../../../components/issue-create-form';
 import { IssueCard } from '../../../../../components/issue-card';
@@ -99,7 +99,7 @@ export default function OrganizationBoardPage({ params }: BoardDetailPageProps) 
     }, [issues]);
 
     useEffect(() => {
-        const wss = new WebSocket("ws://localhost:3006");
+        const wss = new WebSocket(WS_URL);
         setWs(wss);
 
         wss.onopen = () => {
