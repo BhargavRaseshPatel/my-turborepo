@@ -3,7 +3,7 @@ import 'dotenv/config';
 import { authMiddleware } from './authMiddleware';
 import { Request } from 'express';
 
-const server = new WebSocketServer({ port: 3006 });
+export const server = new WebSocketServer({ port: Number(process.env.PORT) || 3006 });
 
 
 const USERS: any = {
@@ -16,7 +16,7 @@ server.on("connection", (socket,) => {
     let joinedRoom: string = ''
     let userId = ''
 
-    socket.on("message", (data: any) => {
+    const onMessage = (data: any) => {
         const parsedData = JSON.parse(data);
         const boardId = parsedData.boardId;
         joinedRoom = boardId
@@ -42,6 +42,9 @@ server.on("connection", (socket,) => {
                 users: USERS[boardId].filter((x: any) => x.userId != userId).map((u: any) => u.userId)
             }))
         }
+
+        // only sockets that joined with a valid token may broadcast
+        if (!userId) return
 
         if(parsedData.type == "add_issue"){
             const {boardId, issueId, createdIssue} = parsedData;
@@ -104,6 +107,11 @@ server.on("connection", (socket,) => {
         }
 
         console.log(USERS)
+    }
+
+    // a bad message (invalid JSON, bad token) must not crash the server
+    socket.on("message", (data: any) => {
+        try { onMessage(data) } catch (e) { console.error("ws message error:", e) }
     })
 
     socket.on("close", () => {

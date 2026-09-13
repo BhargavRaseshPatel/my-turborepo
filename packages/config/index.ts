@@ -1,7 +1,9 @@
 // 5000 is taken by macOS AirPlay Receiver (ControlCenter/AirTunes)
 export const API_PORT = 4000;
 
-export const API_BASE_URL = `http://localhost:${API_PORT}`;
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? `http://localhost:${API_PORT}`;
+
+export const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:3006";
 
 export const AUTH_API = {
   signin: `${API_BASE_URL}/api/auth/signin`,
