@@ -99,7 +99,7 @@ export default function OrganizationBoardPage({ params }: BoardDetailPageProps) 
     }, [issues]);
 
     useEffect(() => {
-        const wss = new WebSocket("ws://localhost:3006");
+        const wss = new WebSocket(process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3006");
         setWs(wss);
 
         wss.onopen = () => {
@@ -128,7 +128,7 @@ export default function OrganizationBoardPage({ params }: BoardDetailPageProps) 
             // }))
 
             if (type == 'add_issue') {
-                setIssues((prev) => ([...prev, { id: issueId , name, description, status,boardId}]))
+                setIssues((prev) => ([...prev, { id: issueId, name, description, status, boardId }]))
             }
 
             console.log(data, "ISSUE", issues)
