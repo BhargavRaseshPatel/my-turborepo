@@ -56,30 +56,24 @@ model Board {
 
   // Relations
   organization Organization @relation(fields: [organizationId], references: [id])
-  sections     Section[]
   issues       Issue[]
 }
 
-model Section {
-  id      String @id @default(uuid())
-  title   String
-  boardId String
-
-  // Relations
-  board  Board   @relation(fields: [boardId], references: [id])
-  issues Issue[]
+enum IssueStatus {
+  UPCOMING
+  IN_PROGRESS
+  DONE
 }
 
 model Issue {
-  id          String @id @default(uuid())
+  id          String      @id @default(uuid())
   name        String
   description String
   boardId     String
-  sectionId   String
+  status      IssueStatus @default(UPCOMING)
 
   // Relations
   board         Board          @relation(fields: [boardId], references: [id])
-  section       Section        @relation(fields: [sectionId], references: [id])
   issueMappings IssueMapping[]
   comments      Comments[]
 }
