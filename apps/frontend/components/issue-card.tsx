@@ -26,7 +26,7 @@ export function IssueCard({
   const tagLabel = issue.tag
     .replaceAll('_', ' ')
     .toLowerCase()
-    .replace(/\b\w/g, (character) => character.toUpperCase());
+    .replace(/\b\w/g, (character: string) => character.toUpperCase());
 
   return (
     <article className="issue-card">

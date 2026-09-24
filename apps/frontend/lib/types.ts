@@ -1,5 +1,3 @@
-import type { IssueTag  as IssueTagDB} from "../../../packages/db/generated/prisma/enums"
-
 export type Board = {
     id: string;
     name: string;
@@ -18,7 +16,18 @@ export type Organization = {
 
 export type IssueStatus = 'UPCOMING' | 'IN_PROGRESS' | 'DONE';
 
-export type IssueTag = IssueTagDB
+export type IssueTag =
+    | 'DESIGN'
+    | 'FRONTEND_CODING'
+    | 'BACKEND_CODING'
+    | 'MARKETING'
+    | 'PRODUCT'
+    | 'BUG'
+    | 'DOCUMENTATION'
+    | 'RESEARCH'
+    | 'TESTING'
+    | 'OPERATIONS'
+    | 'FEATURE';
 
 export type Issue = {
     id: string;
