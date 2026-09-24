@@ -11,6 +11,7 @@ export const AUTH_API = {
 export const ORG_API = {
   list: `${API_BASE_URL}/api/organizations`,
   create: `${API_BASE_URL}/api/organizations/createOrg`,
+  addMember: (organizationId: string) => `${API_BASE_URL}/api/organizations/${organizationId}/members`,
 } as const;
 
 export const BOARD_API = {

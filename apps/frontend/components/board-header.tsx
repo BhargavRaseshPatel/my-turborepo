@@ -34,10 +34,16 @@ export function BoardHeader({
 
   return (
     <header className="board-header">
-      <div>
-        <p className="board-eyebrow">Project workspace</p>
-        <h1 className="board-heading">{organizationName}</h1>
-        <p className="mt-2 text-base font-bold text-slate-600">{boardName}</p>
+      <div className="board-identity">
+        {/* <button className="board-back-button" type="button" onClick={() => router.push('/dashboard')} aria-label="Back to dashboard">
+          <span aria-hidden="true">←</span>
+          <span className="hidden sm:inline">Dashboard</span>
+        </button>
+        <span className="board-brand-mark" aria-label="Trello">T</span> */}
+        <div className="board-heading-group">
+          <h1 className="board-heading">{organizationName}</h1>
+          <p className="mt-2 text-base font-bold text-slate-600">{boardName}</p>
+        </div>
       </div>
 
       <div className="board-actions">

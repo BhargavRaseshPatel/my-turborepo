@@ -12,6 +12,14 @@ export type Organization = {
     role?: string;
     adminId?: string;
     boards?: Board[];
+    members?: OrganizationMember[];
+};
+
+export type OrganizationMember = {
+        id: string;
+        username: string;
+        email: string;
+        role?: string;
 };
 
 export type IssueStatus = 'UPCOMING' | 'IN_PROGRESS' | 'DONE';

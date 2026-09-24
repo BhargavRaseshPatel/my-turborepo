@@ -32,21 +32,104 @@ export const createOrganizationService = async ({
 };
 
 export const getOrganizationsService = async (userId: string) => {
-    const memberships = await prisma.members.findMany({
+    const organizations = await prisma.organization.findMany({
         where: {
-            userId,
+            members: {
+                some: {
+                    userId,
+                },
+            },
         },
         select: {
-            organization: {
+            id: true,
+            name: true,
+            description: true,
+            adminId: true,
+            members: {
                 select: {
-                    id: true,
-                    name: true,
-                    description: true,
-                    adminId: true,
+                    role: true,
+                    userId: true,
+                    user: {
+                        select: {
+                            id: true,
+                            username: true,
+                            email: true,
+                        },
+                    },
                 },
             },
         },
     });
 
-    return memberships.map((membership) => membership.organization);
+    return organizations.map((organization) => ({
+        ...organization,
+        role: organization.members.find((member) => member.userId === userId)?.role ?? "member",
+    }));
+};
+
+type AddOrganizationMemberInput = {
+    organizationId: string;
+    adminId: string;
+    email: string;
+};
+
+export const addOrganizationMemberService = async ({
+    organizationId,
+    adminId,
+    email,
+}: AddOrganizationMemberInput) => {
+    const organization = await prisma.organization.findUnique({
+        where: { id: organizationId },
+    });
+
+    if (!organization) {
+        throw new Error("Organization not found");
+    }
+
+    if (organization.adminId !== adminId) {
+        throw new Error("Only organization admins can add members");
+    }
+
+    const user = await prisma.user.findFirst({
+        where: {
+            email: {
+                equals: email,
+                mode: "insensitive",
+            },
+        },
+    });
+
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    const existingMembership = await prisma.members.findUnique({
+        where: {
+            userId_orgId: {
+                userId: user.id,
+                orgId: organizationId,
+            },
+        },
+    });
+
+    if (existingMembership) {
+        throw new Error("User is already a member of this organization");
+    }
+
+    return prisma.members.create({
+        data: {
+            userId: user.id,
+            orgId: organizationId,
+            role: "member",
+        },
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    username: true,
+                    email: true,
+                },
+            },
+        },
+    });
 };

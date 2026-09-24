@@ -3,7 +3,7 @@
 import { use, useEffect, useMemo, useState } from 'react';
 import { listBoards } from '../../../../../lib/api/boards';
 import { createIssue, deleteIssue, listIssuesByBoard, updateIssueStatus } from '../../../../../lib/api/issues';
-import { listOrganizations } from '../../../../../lib/api/organizations';
+import { addOrganizationMember, listOrganizations } from '../../../../../lib/api/organizations';
 import type { Issue, IssueStatus, Organization } from '../../../../../lib/types';
 import { BoardHeader, type BoardOption } from '../../../../../components/board-header';
 import { IssueCreateForm, type IssueFormData } from '../../../../../components/issue-create-form';
@@ -188,7 +188,7 @@ const moveIssue = async (issueId: string, status: IssueStatus, direction: 'left'
     };
 
     const handleAddMember = async (email: string) => {
-        throw new Error(`Adding ${email} requires a member API endpoint.`);
+        await addOrganizationMember(organizationId, email);
     };
 
     const tokenPayload = getTokenPayload();
