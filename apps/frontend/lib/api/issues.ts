@@ -32,3 +32,9 @@ export function updateIssueStatus(issueId: string, status: IssueStatus) {
     body: JSON.stringify({ status }),
   });
 }
+
+export function deleteIssue(issueId: string) {
+  return apiRequest<{ message?: string }>(`${ISSUE_API.base}/${issueId}`, {
+    method: 'DELETE',
+  });
+}

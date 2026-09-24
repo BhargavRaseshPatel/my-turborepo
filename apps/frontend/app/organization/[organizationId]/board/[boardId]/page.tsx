@@ -2,7 +2,7 @@
 
 import { use, useEffect, useMemo, useState } from 'react';
 import { listBoards } from '../../../../../lib/api/boards';
-import { createIssue, listIssuesByBoard, updateIssueStatus } from '../../../../../lib/api/issues';
+import { createIssue, deleteIssue, listIssuesByBoard, updateIssueStatus } from '../../../../../lib/api/issues';
 import { listOrganizations } from '../../../../../lib/api/organizations';
 import type { Issue, IssueStatus, Organization } from '../../../../../lib/types';
 import { BoardHeader, type BoardOption } from '../../../../../components/board-header';
@@ -171,6 +171,17 @@ const moveIssue = async (issueId: string, status: IssueStatus, direction: 'left'
         }
     };
 
+    const handleDeleteIssue = async (issueId: string) => {
+        if (!window.confirm('Are you sure you want to delete this issue?')) return;
+
+        try {
+            await deleteIssue(issueId);
+            setIssues((current) => current.filter((issue) => issue.id !== issueId));
+        } catch (error) {
+            console.error('Could not delete issue:', error);
+        }
+    };
+
     const handleAddMember = async (email: string) => {
         throw new Error(`Adding ${email} requires a member API endpoint.`);
     };
@@ -201,6 +212,7 @@ const moveIssue = async (issueId: string, status: IssueStatus, direction: 'left'
                                     statusTitle={column.title}
                                     canMoveLeft={statusOrder.indexOf(column.key) > 0}
                                     canMoveRight={statusOrder.indexOf(column.key) < statusOrder.length - 1}
+                                    onDelete={() => handleDeleteIssue(issue.id)}
                                     onMove={(direction) => moveIssue(issue.id, column.key, direction)}
                                 />
                             )) : <div className="empty-state">No issues here</div>}

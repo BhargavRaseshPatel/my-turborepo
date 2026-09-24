@@ -12,6 +12,7 @@ type IssueCardProps = {
   statusTitle: string;
   canMoveLeft: boolean;
   canMoveRight: boolean;
+  onDelete: () => void;
   onMove: (direction: 'left' | 'right') => void;
 };
 
@@ -20,6 +21,7 @@ export function IssueCard({
   statusTitle,
   canMoveLeft,
   canMoveRight,
+  onDelete,
   onMove,
 }: IssueCardProps) {
   return (
@@ -31,24 +33,29 @@ export function IssueCard({
       <h3 className="issue-card-title">{issue.name}</h3>
       <p className="issue-card-description">{issue.description}</p>
       <div className="issue-card-actions">
-        <button
-          className="icon-button"
-          type="button"
-          onClick={() => onMove('left')}
-          disabled={!canMoveLeft}
-          aria-label={`Move ${issue.name} to the previous status`}
-        >
-          &lt;
+        <button className="delete-issue-button" type="button" onClick={onDelete}>
+          Delete
         </button>
-        <button
-          className="icon-button"
-          type="button"
-          onClick={() => onMove('right')}
-          disabled={!canMoveRight}
-          aria-label={`Move ${issue.name} to the next status`}
-        >
-          &gt;
-        </button>
+        <div className="issue-move-actions">
+          <button
+            className="icon-button"
+            type="button"
+            onClick={() => onMove('left')}
+            disabled={!canMoveLeft}
+            aria-label={`Move ${issue.name} to the previous status`}
+          >
+            &lt;
+          </button>
+          <button
+            className="icon-button"
+            type="button"
+            onClick={() => onMove('right')}
+            disabled={!canMoveRight}
+            aria-label={`Move ${issue.name} to the next status`}
+          >
+            &gt;
+          </button>
+        </div>
       </div>
     </article>
   );

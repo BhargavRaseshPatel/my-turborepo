@@ -79,3 +79,35 @@ export const updateIssueStatus = async (
 
   return issue;
 };
+
+export const deleteIssueService = async (issueId: string) => {
+  const issue = await prisma.issue.findUnique({
+    where: {
+      id: issueId,
+    },
+  });
+
+  if (!issue) {
+    throw new Error("Issue not found");
+  }
+
+  await prisma.$transaction([
+    prisma.issueMapping.deleteMany({
+      where: {
+        issueId,
+      },
+    }),
+    prisma.comments.deleteMany({
+      where: {
+        issueId,
+      },
+    }),
+    prisma.issue.delete({
+      where: {
+        id: issueId,
+      },
+    }),
+  ]);
+
+  return issue;
+};

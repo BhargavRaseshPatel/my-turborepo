@@ -1,6 +1,6 @@
 // controllers/issue.controller.ts
 import { Request, Response } from "express";
-import { createIssueService, getIssuesService, updateIssueStatus } from "../services/issue.service";
+import { createIssueService, deleteIssueService, getIssuesService, updateIssueStatus } from "../services/issue.service";
 import { IssueStatus } from "../../../../packages/db/generated/prisma/enums";
 export const createIssue = async (req: Request, res: Response) => {
     try {
@@ -87,6 +87,34 @@ export const getIssues = async (req: Request, res: Response) => {
         }
         return res.status(500).json({
             message: "Internal server error",
+        });
+    }
+};
+
+export const deleteIssue = async (req: Request, res: Response) => {
+    try {
+        const { issueID } = req.params;
+
+        if (!issueID) {
+            return res.status(400).json({
+                message: "issueId is required",
+            });
+        }
+
+        await deleteIssueService(issueID);
+
+        return res.status(200).json({
+            message: "Issue deleted successfully",
+        });
+    } catch (error) {
+        console.error(error);
+        if (error instanceof Error && error.message === "Issue not found") {
+            return res.status(404).json({
+                message: error.message,
+            });
+        }
+        return res.status(500).json({
+            message: "Failed to delete issue",
         });
     }
 };

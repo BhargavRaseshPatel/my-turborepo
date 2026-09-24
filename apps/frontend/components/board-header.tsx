@@ -42,10 +42,10 @@ export function BoardHeader({
 
       <div className="board-actions">
         {boards.length > 0 && (
-          <label className="flex items-center gap-2 text-xs font-bold text-slate-500">
+          <label className="dropdown-label">
             <span className="hidden sm:inline">Board</span>
             <select
-              className="board-switcher"
+              className="dropdown-select"
               value={boardId}
               onChange={(event) => handleBoardChange(event.target.value)}
               aria-label="Change board"
