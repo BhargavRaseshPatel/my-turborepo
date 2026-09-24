@@ -24,15 +24,15 @@ export function IssueCard({
 }: IssueCardProps) {
   return (
     <article className="issue-card">
-      <div className="issue-top-row">
-        <span className="issue-tag">{statusTitle}</span>
-        <span className="issue-meta">#{issue.id.slice(0, 6)}</span>
+      <div className="issue-card-meta">
+        <span className="status-pill">{statusTitle}</span>
+        <span className="text-[11px] text-slate-500">#{issue.id.slice(0, 6)}</span>
       </div>
-      <h3>{issue.name}</h3>
-      <p className="issue-description">{issue.description}</p>
+      <h3 className="issue-card-title">{issue.name}</h3>
+      <p className="issue-card-description">{issue.description}</p>
       <div className="issue-card-actions">
         <button
-          className="issue-move-button"
+          className="icon-button"
           type="button"
           onClick={() => onMove('left')}
           disabled={!canMoveLeft}
@@ -41,7 +41,7 @@ export function IssueCard({
           &lt;
         </button>
         <button
-          className="issue-move-button"
+          className="icon-button"
           type="button"
           onClick={() => onMove('right')}
           disabled={!canMoveRight}

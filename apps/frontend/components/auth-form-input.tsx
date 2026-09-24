@@ -23,7 +23,7 @@ export function AuthFormInput({
 }: AuthFormInputProps) {
   return (
     <div>
-      <label htmlFor={name} className="label">
+      <label htmlFor={name} className="form-label-compact">
         {label}
       </label>
       <input
@@ -36,7 +36,7 @@ export function AuthFormInput({
         autoComplete={autoComplete}
         required={required}
         minLength={minLength}
-        className="input-field"
+        className="form-input"
       />
     </div>
   );

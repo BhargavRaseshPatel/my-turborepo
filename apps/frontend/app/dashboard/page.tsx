@@ -142,8 +142,8 @@ export default function DashboardPage() {
   return (
     <div className="dashboard-shell">
       <header className="dashboard-topbar">
-        <div className="dashboard-toolbar">
-          <span className="dashboard-toolbar-label">Organizations</span>
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-sm font-semibold text-slate-500">Organizations</span>
 
           {organizations.length > 1 ? (
             <select
@@ -158,27 +158,27 @@ export default function DashboardPage() {
               ))}
             </select>
           ) : (
-            <div className="dashboard-pill">{activeOrganization?.name ?? 'No organizations'}</div>
+            <div className="min-w-44 rounded-xl bg-indigo-50 px-3.5 py-2.5 text-sm font-semibold text-indigo-700">{activeOrganization?.name ?? 'No organizations'}</div>
           )}
         </div>
 
-        <button type="button" className="dashboard-primary-btn" onClick={() => setIsCreateOpen(true)}>
+        <button type="button" className="button-primary" onClick={() => setIsCreateOpen(true)}>
           + New Organization
         </button>
       </header>
 
       {isCreateOpen && (
         <div className="dashboard-form-card">
-          <h3>Create new organization</h3>
+          <h3 className="mb-4 text-xl font-extrabold text-slate-900">Create new organization</h3>
 
-          <form className="dashboard-form" onSubmit={handleCreateOrganization}>
+          <form className="grid gap-4" onSubmit={handleCreateOrganization}>
             <div>
               <label className="dashboard-field-label" htmlFor="org-name">
                 Organization name
               </label>
               <input
                 id="org-name"
-                className="dashboard-input"
+                className="form-input"
                 value={formData.name}
                 onChange={(event) => setFormData((current) => ({ ...current, name: event.target.value }))}
                 placeholder="My Company"
@@ -191,7 +191,7 @@ export default function DashboardPage() {
               </label>
               <textarea
                 id="org-description"
-                className="dashboard-textarea"
+                className="form-input min-h-24 resize-y"
                 value={formData.description}
                 onChange={(event) => setFormData((current) => ({ ...current, description: event.target.value }))}
                 placeholder="Describe your organization"
@@ -199,15 +199,14 @@ export default function DashboardPage() {
               />
             </div>
 
-            <div className="dashboard-actions">
-              <button type="button" className="dashboard-secondary-btn" onClick={() => setIsCreateOpen(false)}>
+            <div className="flex justify-end gap-3">
+              <button type="button" className="button-secondary" onClick={() => setIsCreateOpen(false)}>
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="dashboard-primary-btn"
-                style={{ cursor: isSubmitting ? 'not-allowed' : 'pointer', opacity: isSubmitting ? 0.7 : 1 }}
+                className="button-primary"
               >
                 {isSubmitting ? 'Creating...' : 'Create Organization'}
               </button>
@@ -216,60 +215,59 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <main className="dashboard-main">
-        <div className="dashboard-panel">
-          <p className="dashboard-panel-title">Selected organization</p>
+      <main className="mx-auto mt-6 max-w-7xl">
+        <div className="surface-card p-5 sm:p-6">
+          <p className="text-sm text-slate-500">Selected organization</p>
           {isLoading ? (
-            <p className="dashboard-org-meta">Loading organizations...</p>
+            <p className="mt-2 text-slate-500">Loading organizations...</p>
           ) : (
             <>
-              <h2 className="dashboard-org-name">{activeOrganization?.name ?? 'No organization selected'}</h2>
-              <p className="dashboard-org-description">
+              <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">{activeOrganization?.name ?? 'No organization selected'}</h2>
+              <p className="mt-2 text-slate-600">
                 {activeOrganization?.description || 'No description available.'}
               </p>
-              <p className="dashboard-org-meta">Role: {activeOrganization?.role ?? 'Owner'}</p>
+              <p className="mt-2 text-sm text-slate-500">Role: {activeOrganization?.role ?? 'Owner'}</p>
             </>
           )}
         </div>
 
-        <div style={{ marginTop: '24px' }}>
+        <div className="mt-6">
           <div className="dashboard-section-header">
-            <h3>Boards</h3>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <span className="dashboard-count">{(activeOrganization?.boards?.length ?? 0)} boards</span>
-              <button type="button" className="dashboard-primary-btn" onClick={() => setIsBoardCreateOpen(true)}>
+            <h3 className="text-xl font-extrabold text-slate-900">Boards</h3>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-slate-500">{(activeOrganization?.boards?.length ?? 0)} boards</span>
+              <button type="button" className="button-primary" onClick={() => setIsBoardCreateOpen(true)}>
                 + Create Board
               </button>
             </div>
           </div>
 
           {isBoardCreateOpen && (
-            <div className="dashboard-form-card" style={{ marginTop: 0, marginBottom: '20px' }}>
-              <h3>Create new board</h3>
+            <div className="surface-card mb-5 p-5">
+              <h3 className="mb-4 text-xl font-extrabold text-slate-900">Create new board</h3>
 
-              <form className="dashboard-form" onSubmit={handleCreateBoard}>
+              <form className="grid gap-4" onSubmit={handleCreateBoard}>
                 <div>
                   <label className="dashboard-field-label" htmlFor="board-name">
                     Board name
                   </label>
                   <input
                     id="board-name"
-                    className="dashboard-input"
+                    className="form-input"
                     value={boardFormData.name}
                     onChange={(event) => setBoardFormData({ name: event.target.value })}
                     placeholder="Sprint Planning"
                   />
                 </div>
 
-                <div className="dashboard-actions">
-                  <button type="button" className="dashboard-secondary-btn" onClick={() => setIsBoardCreateOpen(false)}>
+                <div className="flex justify-end gap-3">
+                  <button type="button" className="button-secondary" onClick={() => setIsBoardCreateOpen(false)}>
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isBoardSubmitting}
-                    className="dashboard-primary-btn"
-                    style={{ cursor: isBoardSubmitting ? 'not-allowed' : 'pointer', opacity: isBoardSubmitting ? 0.7 : 1 }}
+                    className="button-primary"
                   >
                     {isBoardSubmitting ? 'Creating...' : 'Create Board'}
                   </button>
@@ -278,7 +276,7 @@ export default function DashboardPage() {
             </div>
           )}
 
-          <div className="board-grid">
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4">
             {activeOrganization?.boards && activeOrganization.boards.length > 0 ? (
               activeOrganization.boards.map((board) => (
                 <div
@@ -294,16 +292,16 @@ export default function DashboardPage() {
                   }}
                   className="board-card"
                 >
-                  <div className="board-card-top">
-                    <h4>{board.name}</h4>
-                    <span className="board-card-badge">Board</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <h4 className="text-lg font-extrabold text-slate-900">{board.name}</h4>
+                    <span className="board-badge">Board</span>
                   </div>
 
-                  <p className="board-card-description">{board.description}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-500">{board.description}</p>
                 </div>
               ))
             ) : (
-              <div className="empty-state-card">No boards available in this organization.</div>
+              <div className="dashboard-empty">No boards available in this organization.</div>
             )}
           </div>
         </div>

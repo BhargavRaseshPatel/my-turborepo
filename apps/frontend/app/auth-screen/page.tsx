@@ -44,23 +44,23 @@ export default function AuthScreen() {
   };
 
   return (
-    <div className="auth-screen-shell">
+    <div className="auth-page">
       <div className="auth-card">
-        <div className="auth-brand">
-          <div className="auth-brand-mark">T</div>
+        <div className="brand-badge">
+          <div className="brand-mark">T</div>
           <span>Trello</span>
         </div>
 
-        <div className="auth-header">
-          <h1>{signInScreen ? "Welcome back" : "Create your account"}</h1>
-          <p>
+        <div className="mt-5">
+          <h1 className="auth-heading">{signInScreen ? "Welcome back" : "Create your account"}</h1>
+          <p className="auth-description">
             {signInScreen
               ? "Sign in to continue managing your boards and tasks."
               : "Start organizing your team with smarter planning."}
           </p>
         </div>
 
-        <div className="auth-toggle-group">
+        <div className="auth-tabs">
           <AuthToggleButton active={signInScreen} onClick={() => setSignInScreen(true)}>
             Sign In
           </AuthToggleButton>
@@ -122,12 +122,12 @@ export default function AuthScreen() {
 
           <AuthSubmitButton>{signInScreen ? "Sign In" : "Create Account"}</AuthSubmitButton>
 
-          <p className="auth-cta-text">
+          <p className="auth-footer">
             {signInScreen ? "Don’t have an account?" : "Already have an account?"}{" "}
             <button
               type="button"
               onClick={() => setSignInScreen((prev) => !prev)}
-              className="auth-link-btn"
+              className="auth-link"
             >
               {signInScreen ? "Sign Up" : "Sign In"}
             </button>

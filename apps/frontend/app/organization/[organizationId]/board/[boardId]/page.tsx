@@ -183,16 +183,16 @@ const moveIssue = async (issueId: string, status: IssueStatus, direction: 'left'
     return (
         <main className="board-page">
             <BoardHeader organizationName={organization?.name ?? 'Organization'} boardName={currentBoard?.name ?? 'Board'} boardId={boardId} boards={boards} onProfileClick={() => setIsProfileOpen((open) => !open)} />
-            {isProfileOpen && <div className="profile-menu-wrap"><ProfileMenu isAdmin={isAdmin} organizationName={organization?.name ?? 'Organization'} onAddMember={handleAddMember} /></div>}
+            {isProfileOpen && <div className="profile-overlay"><div className="pointer-events-auto"><ProfileMenu isAdmin={isAdmin} organizationName={organization?.name ?? 'Organization'} onAddMember={handleAddMember} /></div></div>}
             {isIssueFormOpen ? (
                 <IssueCreateForm formData={formData} isSubmitting={isSubmitting} onChange={setFormData} onSubmit={handleCreateIssue} onCancel={() => setIsIssueFormOpen(false)} />
             ) : (
-                <div className="issue-form-trigger-wrap"><button className="primary-button" type="button" onClick={() => setIsIssueFormOpen(true)}>+ Add issue</button></div>
+                <div className="floating-action"><button className="button-gradient shadow-xl shadow-indigo-600/25" type="button" onClick={() => setIsIssueFormOpen(true)}>+ Add issue</button></div>
             )}
-            <section className="board-columns">
+            <section className="board-grid">
                 {boardColumns.map((column) => (
                     <div key={column.key} className="board-column">
-                        <div className="column-header"><div className="column-title-wrap"><span className="column-dot" style={{ background: column.accent }} /><h2>{column.title}</h2></div><span className="issue-count">{groupedIssues[column.key].length}</span></div>
+                        <div className="column-header"><div className="column-heading"><span className="column-dot" style={{ background: column.accent }} /><h2 className="column-title">{column.title}</h2></div><span className="column-issue-count">{groupedIssues[column.key].length}</span></div>
                         <div className="issue-list">
                             {isLoading ? <div className="empty-state">Loading issues...</div> : groupedIssues[column.key].length > 0 ? groupedIssues[column.key].map((issue) => (
                                 <IssueCard

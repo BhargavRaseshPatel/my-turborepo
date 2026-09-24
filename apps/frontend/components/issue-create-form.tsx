@@ -26,7 +26,7 @@ export function IssueCreateForm({
   return (
     <section className="issue-modal-overlay" role="presentation" onMouseDown={onCancel}>
       <form
-        className="issue-form issue-modal"
+        className="issue-modal"
         onSubmit={onSubmit}
         onMouseDown={(event) => event.stopPropagation()}
         role="dialog"
@@ -36,7 +36,7 @@ export function IssueCreateForm({
         <div className="issue-form-header">
           <div>
             <p className="form-kicker">New work item</p>
-            <h2 id="issue-form-title">Add issue</h2>
+            <h2 id="issue-form-title" className="text-xl font-extrabold text-slate-900">Add issue</h2>
           </div>
           <button className="form-close-button" type="button" onClick={onCancel} aria-label="Close add issue form">
             ×
@@ -45,10 +45,10 @@ export function IssueCreateForm({
 
         <div className="issue-form-grid">
           <div>
-            <label className="field-label" htmlFor="issue-name">Issue name</label>
+            <label className="form-label-compact" htmlFor="issue-name">Issue name</label>
             <input
               id="issue-name"
-              className="text-input"
+              className="form-input-compact"
               value={formData.name}
               onChange={(event) => onChange({ ...formData, name: event.target.value })}
               placeholder="Write task title"
@@ -57,10 +57,10 @@ export function IssueCreateForm({
           </div>
 
           <div>
-            <label className="field-label" htmlFor="issue-status">Status</label>
+            <label className="form-label-compact" htmlFor="issue-status">Status</label>
             <select
               id="issue-status"
-              className="text-input"
+              className="form-input-compact"
               value={formData.status}
               onChange={(event) => onChange({ ...formData, status: event.target.value as IssueFormData['status'] })}
             >
@@ -72,10 +72,10 @@ export function IssueCreateForm({
         </div>
 
         <div>
-          <label className="field-label" htmlFor="issue-description">Description</label>
+          <label className="form-label-compact" htmlFor="issue-description">Description</label>
           <textarea
             id="issue-description"
-            className="text-area"
+            className="form-input-compact min-h-24 resize-y"
             value={formData.description}
             onChange={(event) => onChange({ ...formData, description: event.target.value })}
             placeholder="Describe the issue"
@@ -84,7 +84,7 @@ export function IssueCreateForm({
           />
         </div>
 
-        <button className="primary-button" type="submit" disabled={isSubmitting}>
+        <button className="button-gradient mt-5" type="submit" disabled={isSubmitting}>
           {isSubmitting ? 'Saving...' : 'Add Issue'}
         </button>
       </form>

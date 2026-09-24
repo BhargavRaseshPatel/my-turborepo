@@ -9,7 +9,7 @@ export function AuthToggleButton({ active, onClick, children }: AuthToggleButton
     <button
       type="button"
       onClick={onClick}
-      className={`auth-toggle ${active ? "auth-toggle--active" : ""}`}
+      className={`auth-tab ${active ? "auth-tab--active" : ""}`}
     >
       {children}
     </button>
@@ -23,7 +23,7 @@ type AuthSubmitButtonProps = {
 
 export function AuthSubmitButton({ children, type = "submit" }: AuthSubmitButtonProps) {
   return (
-    <button type={type} className="auth-submit-btn">
+    <button type={type} className="auth-submit-button">
       {children}
     </button>
   );

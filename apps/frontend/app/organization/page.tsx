@@ -36,22 +36,22 @@ export default function OrganizationPage() {
   };
 
   return (
-    <main className="organization-create-shell">
-      <section className="organization-create-card">
-        <p className="organization-create-eyebrow">Workspace setup</p>
-        <h1>Create an organization</h1>
-        <p className="organization-create-intro">
+    <main className="setup-page">
+      <section className="setup-card">
+        <p className="page-eyebrow">Workspace setup</p>
+        <h1 className="page-heading">Create an organization</h1>
+        <p className="page-description">
           Set up a shared workspace for your team, projects, and boards.
         </p>
 
-        <form className="organization-create-form" onSubmit={handleCreateOrganization}>
+        <form className="mt-7 grid gap-5" onSubmit={handleCreateOrganization}>
           <div>
-            <label className="dashboard-field-label" htmlFor="organization-name">
+            <label className="form-label" htmlFor="organization-name">
               Organization name
             </label>
             <input
               id="organization-name"
-              className="dashboard-input"
+              className="form-input"
               type="text"
               value={formData.name}
               onChange={(event) => setFormData((current) => ({ ...current, name: event.target.value }))}
@@ -61,12 +61,12 @@ export default function OrganizationPage() {
           </div>
 
           <div>
-            <label className="dashboard-field-label" htmlFor="organization-description">
+            <label className="form-label" htmlFor="organization-description">
               Description
             </label>
             <textarea
               id="organization-description"
-              className="dashboard-textarea"
+              className="form-input min-h-32 resize-y"
               value={formData.description}
               onChange={(event) => setFormData((current) => ({ ...current, description: event.target.value }))}
               placeholder="What does your organization work on?"
@@ -75,9 +75,9 @@ export default function OrganizationPage() {
             />
           </div>
 
-          {errorMessage && <p className="organization-form-error" role="alert">{errorMessage}</p>}
+          {errorMessage && <p className="-mt-1 text-sm text-red-700" role="alert">{errorMessage}</p>}
 
-          <button type="submit" className="dashboard-primary-btn organization-submit-button" disabled={isSubmitting}>
+          <button type="submit" className="button-primary w-full py-3" disabled={isSubmitting}>
             {isSubmitting ? 'Creating...' : 'Create Organization'}
           </button>
         </form>

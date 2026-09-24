@@ -31,41 +31,41 @@ export function ProfileMenu({ isAdmin, organizationName, onAddMember }: ProfileM
   };
 
   return (
-    <aside className="profile-menu" aria-label="Profile information">
-      <div className="profile-menu-header">
-        <div className="profile-avatar profile-avatar-large">BP</div>
+    <aside className="profile-panel" aria-label="Profile information">
+      <div className="profile-header">
+        <div className="avatar size-12 text-sm">BP</div>
         <div>
-          <strong>Bhargav</strong>
-          <span>Product Lead</span>
+          <strong className="block text-slate-900">Bhargav</strong>
+          <span className="profile-role">Product Lead</span>
         </div>
       </div>
-      <div className="profile-menu-detail">
+      <div className="profile-details">
         <span>Current organization</span>
-        <strong>{organizationName}</strong>
+        <strong className="text-sm text-slate-800">{organizationName}</strong>
       </div>
 
       {isAdmin ? (
-        <form className="member-form" onSubmit={handleSubmit}>
-          <p className="member-form-title">Organization admin</p>
-          <label className="field-label" htmlFor="member-email">Add a user</label>
-          <div className="member-form-row">
+        <form className="profile-form" onSubmit={handleSubmit}>
+          <p className="admin-title">Organization admin</p>
+          <label className="form-label-compact" htmlFor="member-email">Add a user</label>
+          <div className="flex items-center gap-2">
             <input
               id="member-email"
-              className="text-input"
+              className="member-input"
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="teammate@example.com"
               required
             />
-            <button className="primary-button" type="submit" disabled={isAdding}>
+            <button className="member-button" type="submit" disabled={isAdding}>
               {isAdding ? '...' : 'Add'}
             </button>
           </div>
-          {message && <p className="profile-menu-message">{message}</p>}
+          {message && <p className="profile-message">{message}</p>}
         </form>
       ) : (
-        <p className="profile-menu-note">Only organization admins can add users.</p>
+        <p className="profile-note">Only organization admins can add users.</p>
       )}
     </aside>
   );

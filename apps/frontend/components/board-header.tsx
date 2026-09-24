@@ -35,15 +35,15 @@ export function BoardHeader({
   return (
     <header className="board-header">
       <div>
-        <p className="eyebrow">Project workspace</p>
-        <h1>{organizationName}</h1>
-        <p className="board-title">{boardName}</p>
+        <p className="board-eyebrow">Project workspace</p>
+        <h1 className="board-heading">{organizationName}</h1>
+        <p className="mt-2 text-base font-bold text-slate-600">{boardName}</p>
       </div>
 
-      <div className="header-actions">
+      <div className="board-actions">
         {boards.length > 0 && (
-          <label className="board-switcher-label">
-            <span>Board</span>
+          <label className="flex items-center gap-2 text-xs font-bold text-slate-500">
+            <span className="hidden sm:inline">Board</span>
             <select
               className="board-switcher"
               value={boardId}
@@ -59,13 +59,13 @@ export function BoardHeader({
           </label>
         )}
 
-        <button className="profile-button" type="button" onClick={onProfileClick} aria-label="Open profile menu">
-          <span className="profile-avatar">BP</span>
-          <span className="profile-button-copy">
-            <strong>Bhargav</strong>
-            <small>Account</small>
+        <button className="profile-menu-trigger" type="button" onClick={onProfileClick} aria-label="Open profile menu">
+          <span className="avatar">BP</span>
+          <span className="board-profile">
+            <strong className="text-sm text-slate-900">Bhargav</strong>
+            <small className="text-[11px] text-slate-500">Account</small>
           </span>
-          <span className="profile-chevron" aria-hidden="true">⌄</span>
+          <span className="text-slate-400" aria-hidden="true">⌄</span>
         </button>
       </div>
     </header>
