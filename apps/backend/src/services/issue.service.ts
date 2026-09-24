@@ -1,6 +1,6 @@
 import { prisma } from "db/client";
+import { IssueStatus } from "../../../../packages/db/generated/prisma/enums";
 
-type IssueStatus = "UPCOMING" | "IN_PROGRESS" | "DONE";
 
 type CreateIssueInput = {
   name: string;
@@ -61,4 +61,21 @@ export const getIssuesService = async (boardId: string) => {
       boardId,
     },
   });
+};
+
+
+export const updateIssueStatus = async (
+  issueId: string,
+  status: IssueStatus
+) => {
+  const issue = await prisma.issue.update({
+    where: {
+      id: issueId,
+    },
+    data: {
+      status,
+    },
+  });
+
+  return issue;
 };

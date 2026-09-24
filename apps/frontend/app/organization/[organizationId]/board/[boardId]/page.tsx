@@ -1,15 +1,15 @@
 'use client';
 
 import { use, useEffect, useMemo, useState } from 'react';
-import { BOARD_API, ISSUE_API, ORG_API } from '@repo/config';
+import { listBoards } from '../../../../../lib/api/boards';
+import { createIssue, listIssuesByBoard, updateIssueStatus } from '../../../../../lib/api/issues';
+import { listOrganizations } from '../../../../../lib/api/organizations';
+import type { Issue, IssueStatus, Organization } from '../../../../../lib/types';
 import { BoardHeader, type BoardOption } from '../../../../../components/board-header';
 import { IssueCreateForm, type IssueFormData } from '../../../../../components/issue-create-form';
 import { IssueCard } from '../../../../../components/issue-card';
 import { ProfileMenu } from '../../../../../components/profile-menu';
 
-type IssueStatus = 'UPCOMING' | 'IN_PROGRESS' | 'DONE';
-type Issue = { id: string; name: string; description: string; status?: IssueStatus; boardId: string };
-type Organization = { id: string; name: string; description?: string; adminId?: string };
 type BoardDetailPageProps = { params: Promise<{ organizationId: string; boardId: string }> };
 
 const boardColumns: Array<{ key: IssueStatus; title: string; accent: string }> = [
@@ -47,24 +47,12 @@ export default function OrganizationBoardPage({ params }: BoardDetailPageProps) 
     const [formData, setFormData] = useState<IssueFormData>({ name: '', description: '', status: 'UPCOMING' });
     const [ws, setWs] = useState<WebSocket | null>(null);
 
-    const requestHeaders = (): Record<string, string> => {
-        const token = localStorage.getItem('token');
-        return token ? { Authorization: `Bearer ${token}` } : {};
-    };
-
     useEffect(() => {
         const loadContext = async () => {
             try {
-                const [organizationsResponse, boardsResponse] = await Promise.all([
-                    fetch(ORG_API.list, { headers: requestHeaders() }),
-                    fetch(BOARD_API.list, { headers: requestHeaders() }),
-                ]);
-                const organizationsData = await organizationsResponse.json();
-                const boardsData = await boardsResponse.json();
-                const organizations = organizationsData.organizations ?? [];
-                const availableBoards = boardsData.boards ?? [];
+                const [organizations, availableBoards] = await Promise.all([listOrganizations(), listBoards()]);
                 setOrganization(organizations.find((item: Organization) => String(item.id) === organizationId));
-                setBoards(availableBoards.map((board: BoardOption) => ({
+                setBoards(availableBoards.map((board) => ({
                     id: String(board.id), name: board.name, organizationId: String(board.organizationId),
                 })));
             } catch (error) {
@@ -78,10 +66,7 @@ export default function OrganizationBoardPage({ params }: BoardDetailPageProps) 
         const loadIssues = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch(`${ISSUE_API.listByBoard}/${boardId}`, { headers: requestHeaders() });
-                if (!response.ok) throw new Error('Failed to load issues');
-                const data = await response.json();
-                setIssues(Array.isArray(data.issues) ? data.issues : []);
+                setIssues(await listIssuesByBoard(boardId));
             } catch (error) {
                 console.error('Could not fetch issues:', error);
                 setIssues([]);
@@ -137,12 +122,15 @@ export default function OrganizationBoardPage({ params }: BoardDetailPageProps) 
 
     }, [])
 
-    const moveIssue = (issueId: string, status: IssueStatus, direction: 'left' | 'right') => {
-        const currentIndex = statusOrder.indexOf(status);
-        const nextIndex = direction === 'left' ? currentIndex - 1 : currentIndex + 1;
-        const nextStatus = statusOrder[nextIndex];
+const moveIssue = async (issueId: string, status: IssueStatus, direction: 'left' | 'right') => {
+    const currentIndex = statusOrder.indexOf(status);
+    const nextIndex = direction === 'left' ? currentIndex - 1 : currentIndex + 1;
+    const nextStatus = statusOrder[nextIndex];
 
-        if (!nextStatus) return;
+    if (!nextStatus) return;
+
+    try {
+        await updateIssueStatus(issueId, nextStatus);
 
         ws?.send(JSON.stringify({
             type: 'issue_move',
@@ -150,9 +138,11 @@ export default function OrganizationBoardPage({ params }: BoardDetailPageProps) 
             status,
             direction,
             boardId
-        }))
-
-    };
+        }));
+    } catch (error) {
+        console.error('Could not move issue:', error);
+    }
+};
 
 
     const handleCreateIssue = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -160,20 +150,12 @@ export default function OrganizationBoardPage({ params }: BoardDetailPageProps) 
         if (!formData.name.trim() || !formData.description.trim()) return;
         setIsSubmitting(true);
         try {
-            const response = await fetch(ISSUE_API.create, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', ...requestHeaders() },
-                body: JSON.stringify({ name: formData.name.trim(), description: formData.description.trim(), boardId, status: formData.status }),
-            });
-            const data = await response.json().catch(() => ({}));
-            if (!response.ok) throw new Error(data.message || 'Failed to create issue');
-            const createdIssue: Issue = data.issue ?? {
-                id: Date.now().toString(),
+            const createdIssue = await createIssue({
                 name: formData.name.trim(),
                 description: formData.description.trim(),
-                status: formData.status,
                 boardId,
-            };
+                status: formData.status,
+            });
             setIssues((current) => [createdIssue, ...current]);
 
             ws?.send(JSON.stringify({

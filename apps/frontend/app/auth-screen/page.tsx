@@ -5,7 +5,7 @@ import {
   AuthSubmitButton,
   AuthToggleButton,
 } from "@/components/auth-form-controls";
-import { AUTH_API } from "@repo/config";
+import { signIn, signUp } from "@/lib/api/auth";
 import { useRouter } from "next/navigation";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 
@@ -27,39 +27,15 @@ export default function AuthScreen() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const endpoint = signInScreen ? AUTH_API.signin : AUTH_API.signup;
-
-    const payload = signInScreen
-      ? {
-          email: formData.email,
-          password: formData.password,
-        }
-      : {
-          username: formData.name,
-          email: formData.email,
-          password: formData.password,
-        };
-
     try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Authentication failed");
-      }
+      const data = signInScreen
+        ? await signIn({ email: formData.email, password: formData.password })
+        : await signUp({ username: formData.name, email: formData.email, password: formData.password });
 
       if (data.token) {
         localStorage.setItem("token", data.token);
       }
 
-      console.log("Auth success:", data);
       router.push("/dashboard");
     } catch (error) {
       console.error("Auth error:", error);

@@ -1,6 +1,7 @@
 // controllers/issue.controller.ts
 import { Request, Response } from "express";
-import { createIssueService, getIssuesService } from "../services/issue.service";
+import { createIssueService, getIssuesService, updateIssueStatus } from "../services/issue.service";
+import { IssueStatus } from "../../../../packages/db/generated/prisma/enums";
 export const createIssue = async (req: Request, res: Response) => {
     try {
         const { name, description, boardId, status } = req.body;
@@ -33,6 +34,34 @@ export const createIssue = async (req: Request, res: Response) => {
         });
     }
 };
+export const updateIssue = async (req: Request, res: Response) => {
+  try {
+    const { issueID } = req.params;
+    const { status } = req.body;
+
+    if (!issueID) {
+      return res.status(400).json({
+        message: "issueId is required",
+      });
+    }
+
+    const issue = await updateIssueStatus(
+      issueID as string,
+      status as IssueStatus
+    );
+
+    return res.status(200).json({
+      message: "Issue updated successfully",
+      issue,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed to update issue",
+      error,
+    });
+  }
+};
+
 export const getIssues = async (req: Request, res: Response) => {
     try {
         const { boardId } = req.params;

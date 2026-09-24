@@ -2,93 +2,9 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { BOARD_API, ORG_API } from '@repo/config';
-
-type Board = {
-  id: string;
-  name: string;
-  description: string;
-};
-
-type Organization = {
-  id: string;
-  name: string;
-  description?: string;
-  role?: string;
-  boards?: Board[];
-};
-
-const normalizeBoard = (board: any): Board => ({
-  id: String(board.id ?? board._id ?? board.boardId ?? `${board.name ?? 'board'}-${Math.random()}`),
-  name: board.name ?? 'Untitled board',
-  description: board.description ?? '',
-});
-
-const normalizeOrganization = (item: any): Organization => ({
-  id: String(item.id ?? item._id ?? item.organizationId ?? item.name ?? 'org-1'),
-  name: item.name ?? 'Untitled organization',
-  description: item.description ?? '',
-  role: item.role ?? 'Owner',
-  boards: Array.isArray(item.boards)
-    ? item.boards.map((board: any) => normalizeBoard(board))
-    : [],
-});
-
-const fetchOrganizations = async (): Promise<Organization[]> => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-
-  try {
-    const response = await fetch(ORG_API.list, {
-      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to load organizations');
-    }
-
-    const data = await response.json();
-    const items = Array.isArray(data)
-      ? data
-      : data.organizations ?? data.organization ?? data.data ?? [];
-
-    return Array.isArray(items) ? items.map(normalizeOrganization) : [];
-  } catch (error) {
-    console.warn(`Could not fetch organizations from ${ORG_API.list}:`, error);
-    return [];
-  }
-};
-
-const fetchBoards = async (): Promise<Record<string, Board[]>> => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-
-  try {
-    const response = await fetch(BOARD_API.list, {
-      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to load boards');
-    }
-
-    const data = await response.json();
-    const boards = Array.isArray(data)
-      ? data
-      : data.boards ?? data.board ?? data.data ?? [];
-
-    const groupedBoards = (Array.isArray(boards) ? boards : []).reduce<Record<string, Board[]>>((acc, board) => {
-      const orgId = String(board.organizationId ?? board.orgId ?? board.organization?.id ?? '');
-      if (!orgId) return acc;
-
-      acc[orgId] = [...(acc[orgId] ?? []), normalizeBoard(board)];
-      return acc;
-    }, {});
-
-    return groupedBoards;
-  } catch (error) {
-    console.warn(`Could not fetch boards from ${BOARD_API.list}:`, error);
-    return {};
-  }
-};
+import { createBoard, listBoards } from '@/lib/api/boards';
+import { createOrganization, listOrganizations } from '@/lib/api/organizations';
+import type { Board, Organization } from '@/lib/types';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -107,8 +23,12 @@ export default function DashboardPage() {
     setIsLoading(true);
 
     try {
-      const orgs = await fetchOrganizations();
-      const groupedBoards = await fetchBoards();
+      const [orgs, boards] = await Promise.all([listOrganizations(), listBoards()]);
+      const groupedBoards = boards.reduce<Record<string, Board[]>>((acc, board) => {
+        const orgId = String(board.organizationId ?? '');
+        if (orgId) acc[orgId] = [...(acc[orgId] ?? []), board];
+        return acc;
+      }, {});
       setAllBoards(groupedBoards);
       const organizationsWithBoards = orgs.map((organization) => ({
         ...organization,
@@ -163,23 +83,7 @@ export default function DashboardPage() {
     setIsSubmitting(true);
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(ORG_API.create, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ name, description }),
-      });
-
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to create organization');
-      }
-
-      const createdOrganization = normalizeOrganization(data.organization ?? data.data ?? data);
+      const createdOrganization = await createOrganization(name, description);
       setOrganizations((current) => [createdOrganization, ...current]);
       setSelectedOrgId(String(createdOrganization.id));
       setFormData({ name: '', description: '' });
@@ -210,26 +114,7 @@ export default function DashboardPage() {
     setIsBoardSubmitting(true);
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(BOARD_API.create, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({
-          name,
-          organizationId: selectedOrgId,
-        }),
-      });
-
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to create board');
-      }
-
-      const createdBoard = normalizeBoard(data.board ?? data.data ?? data);
+      const createdBoard = await createBoard(name, selectedOrgId);
       setAllBoards((current) => ({
         ...current,
         [String(selectedOrgId)]: [...(current[String(selectedOrgId)] ?? []), createdBoard],

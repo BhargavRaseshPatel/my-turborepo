@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { ORG_API } from '@repo/config';
+import { createOrganization } from '@/lib/api/organizations';
 
 export default function OrganizationPage() {
   const router = useRouter();
@@ -25,21 +25,7 @@ export default function OrganizationPage() {
     setErrorMessage('');
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(ORG_API.create, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ name, description }),
-      });
-
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to create organization.');
-      }
+      await createOrganization(name, description);
 
       router.push('/dashboard');
     } catch (error) {
