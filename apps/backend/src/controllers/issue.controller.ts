@@ -101,7 +101,7 @@ export const deleteIssue = async (req: Request, res: Response) => {
             });
         }
 
-        await deleteIssueService(issueID);
+        await deleteIssueService(issueID as string);
 
         return res.status(200).json({
             message: "Issue deleted successfully",

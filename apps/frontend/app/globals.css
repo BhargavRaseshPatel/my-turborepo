@@ -236,6 +236,10 @@
     @apply mt-4 text-xs text-slate-500;
   }
 
+  .logout-button {
+    @apply mt-4 w-full rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-bold text-red-700 transition hover:border-red-300 hover:bg-red-100;
+  }
+
   .issue-modal-overlay {
     @apply fixed inset-0 z-20 flex items-center justify-center bg-slate-950/50 p-5 backdrop-blur-sm;
   }

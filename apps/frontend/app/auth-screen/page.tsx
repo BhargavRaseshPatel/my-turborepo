@@ -6,11 +6,13 @@ import {
   AuthToggleButton,
 } from "@/components/auth-form-controls";
 import { signIn, signUp } from "@/lib/api/auth";
+import { useAuth } from "@/components/auth-provider";
 import { useRouter } from "next/navigation";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 
 export default function AuthScreen() {
   const router = useRouter();
+  const { login } = useAuth();
   const [signInScreen, setSignInScreen] = useState<boolean>(true);
   const [formData, setFormData] = useState({
     name: "",
@@ -33,7 +35,7 @@ export default function AuthScreen() {
         : await signUp({ username: formData.name, email: formData.email, password: formData.password });
 
       if (data.token) {
-        localStorage.setItem("token", data.token);
+        login(data.token);
       }
 
       router.push("/dashboard");

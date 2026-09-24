@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from './auth-provider';
 
 type ProfileMenuProps = {
   isAdmin: boolean;
@@ -9,6 +11,8 @@ type ProfileMenuProps = {
 };
 
 export function ProfileMenu({ isAdmin, organizationName, onAddMember }: ProfileMenuProps) {
+  const router = useRouter();
+  const { logout } = useAuth();
   const [email, setEmail] = useState('');
   const [isAdding, setIsAdding] = useState(false);
   const [message, setMessage] = useState('');
@@ -28,6 +32,11 @@ export function ProfileMenu({ isAdmin, organizationName, onAddMember }: ProfileM
     } finally {
       setIsAdding(false);
     }
+  };
+
+  const handleLogout = () => {
+    logout();
+    router.push('/auth-screen');
   };
 
   return (
@@ -67,6 +76,10 @@ export function ProfileMenu({ isAdmin, organizationName, onAddMember }: ProfileM
       ) : (
         <p className="profile-note">Only organization admins can add users.</p>
       )}
+
+      <button className="logout-button" type="button" onClick={handleLogout}>
+        Log out
+      </button>
     </aside>
   );
 }
