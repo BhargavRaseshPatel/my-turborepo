@@ -261,7 +261,7 @@
   }
 
   .issue-form-grid {
-    @apply mt-5 grid gap-4 sm:grid-cols-[1.7fr_1fr];
+    @apply mt-5 grid gap-4 sm:grid-cols-[1.5fr_1fr_1fr];
   }
 
   .issue-card-meta {

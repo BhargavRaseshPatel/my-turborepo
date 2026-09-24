@@ -44,7 +44,7 @@ export default function OrganizationBoardPage({ params }: BoardDetailPageProps) 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isIssueFormOpen, setIsIssueFormOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
-    const [formData, setFormData] = useState<IssueFormData>({ name: '', description: '', status: 'UPCOMING' });
+    const [formData, setFormData] = useState<IssueFormData>({ name: '', description: '', status: 'UPCOMING', tag: 'FEATURE' });
     const [ws, setWs] = useState<WebSocket | null>(null);
 
     useEffect(() => {
@@ -99,7 +99,7 @@ export default function OrganizationBoardPage({ params }: BoardDetailPageProps) 
             const data = ev.data;
 
             const parsedData = JSON.parse(data);
-            const { type, issueId, status, name, description } = parsedData
+            const { type, issueId, status, tag, name, description } = parsedData
 
             if (type == 'issue_move') {
                 setIssues((prev) =>
@@ -113,7 +113,9 @@ export default function OrganizationBoardPage({ params }: BoardDetailPageProps) 
             // }))
 
             if (type == 'add_issue') {
-                setIssues((prev) => ([...prev, { id: issueId, name, description, status, boardId }]))
+                setIssues((prev) => prev.some((issue) => issue.id === issueId)
+                    ? prev
+                    : [...prev, { id: issueId, name, description, status, tag, boardId }])
             }
 
             console.log(data, "ISSUE", issues)
@@ -155,14 +157,17 @@ const moveIssue = async (issueId: string, status: IssueStatus, direction: 'left'
                 description: formData.description.trim(),
                 boardId,
                 status: formData.status,
+                tag: formData.tag,
             });
-            setIssues((current) => [createdIssue, ...current]);
+            setIssues((current) => current.some((issue) => issue.id === createdIssue.id)
+                ? current
+                : [createdIssue, ...current]);
 
             ws?.send(JSON.stringify({
                 type: 'add_issue',
-                createdIssue, issueId: createdIssue.id
+                createdIssue, issueId: createdIssue.id, boardId
             }))
-            setFormData({ name: '', description: '', status: 'UPCOMING' });
+            setFormData({ name: '', description: '', status: 'UPCOMING', tag: 'FEATURE' });
             setIsIssueFormOpen(false);
         } catch (error) {
             console.error('Could not create issue:', error);
@@ -209,7 +214,6 @@ const moveIssue = async (issueId: string, status: IssueStatus, direction: 'left'
                                 <IssueCard
                                     key={issue.id}
                                     issue={issue}
-                                    statusTitle={column.title}
                                     canMoveLeft={statusOrder.indexOf(column.key) > 0}
                                     canMoveRight={statusOrder.indexOf(column.key) < statusOrder.length - 1}
                                     onDelete={() => handleDeleteIssue(issue.id)}

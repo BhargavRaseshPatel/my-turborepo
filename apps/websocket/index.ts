@@ -45,7 +45,7 @@ server.on("connection", (socket,) => {
 
         if(parsedData.type == "add_issue"){
             const {boardId, issueId, createdIssue} = parsedData;
-            const {name, description, status} =  createdIssue
+            const {name, description, status, tag} =  createdIssue
 
             USERS[parsedData.createdIssue.boardId]?.forEach(({socket} : any) => socket.send(
                 JSON.stringify({
@@ -54,6 +54,7 @@ server.on("connection", (socket,) => {
                     name : name,
                     description : description,
                     status: status,
+                    tag: tag,
                     boardId
                 })
             ))

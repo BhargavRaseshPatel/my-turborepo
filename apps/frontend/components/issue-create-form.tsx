@@ -1,12 +1,28 @@
 'use client';
 
 import type { FormEvent } from 'react';
+import type { IssueTag } from '../lib/types';
 
 export type IssueFormData = {
   name: string;
   description: string;
   status: 'UPCOMING' | 'IN_PROGRESS' | 'DONE';
+  tag: IssueTag;
 };
+
+const issueTagOptions: Array<{ value: IssueTag; label: string }> = [
+  { value: 'DESIGN', label: 'Design' },
+  { value: 'FRONTEND_CODING', label: 'Frontend coding' },
+  { value: 'BACKEND_CODING', label: 'Backend coding' },
+  { value: 'MARKETING', label: 'Marketing' },
+  { value: 'PRODUCT', label: 'Product' },
+  { value: 'BUG', label: 'Bug' },
+  { value: 'DOCUMENTATION', label: 'Documentation' },
+  { value: 'RESEARCH', label: 'Research' },
+  { value: 'TESTING', label: 'Testing' },
+  { value: 'OPERATIONS', label: 'Operations' },
+  { value: 'FEATURE', label: 'Feature' },
+];
 
 type IssueCreateFormProps = {
   formData: IssueFormData;
@@ -54,6 +70,22 @@ export function IssueCreateForm({
               placeholder="Write task title"
               required
             />
+          </div>
+
+          <div>
+            <label className="form-label-compact" htmlFor="issue-tag">Tag</label>
+            <select
+              id="issue-tag"
+              className="form-input-compact"
+              value={formData.tag}
+              onChange={(event) => onChange({ ...formData, tag: event.target.value as IssueTag })}
+            >
+              {issueTagOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>

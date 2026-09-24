@@ -5,11 +5,11 @@ type Issue = {
   name: string;
   description: string;
   status?: IssueFormData['status'];
+  tag: IssueFormData['tag'];
 };
 
 type IssueCardProps = {
   issue: Issue;
-  statusTitle: string;
   canMoveLeft: boolean;
   canMoveRight: boolean;
   onDelete: () => void;
@@ -18,16 +18,20 @@ type IssueCardProps = {
 
 export function IssueCard({
   issue,
-  statusTitle,
   canMoveLeft,
   canMoveRight,
   onDelete,
   onMove,
 }: IssueCardProps) {
+  const tagLabel = issue.tag
+    .replaceAll('_', ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (character) => character.toUpperCase());
+
   return (
     <article className="issue-card">
       <div className="issue-card-meta">
-        <span className="status-pill">{statusTitle}</span>
+        <span className="status-pill">{tagLabel}</span>
         <span className="text-[11px] text-slate-500">#{issue.id.slice(0, 6)}</span>
       </div>
       <h3 className="issue-card-title">{issue.name}</h3>

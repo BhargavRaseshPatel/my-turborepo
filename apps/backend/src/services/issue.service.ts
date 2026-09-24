@@ -1,5 +1,5 @@
 import { prisma } from "db/client";
-import { IssueStatus } from "../../../../packages/db/generated/prisma/enums";
+import { IssueStatus, IssueTag } from "../../../../packages/db/generated/prisma/enums";
 
 
 type CreateIssueInput = {
@@ -7,6 +7,7 @@ type CreateIssueInput = {
   description: string;
   boardId: string;
   status?: string;
+  tag?: string;
 };
 
 const normalizeIssueStatus = (status?: string): IssueStatus => {
@@ -19,11 +20,23 @@ const normalizeIssueStatus = (status?: string): IssueStatus => {
   return "UPCOMING";
 };
 
+const normalizeIssueTag = (tag?: string): IssueTag => {
+  const normalizedTag = tag?.trim().toUpperCase();
+  const validTags = Object.values(IssueTag) as string[];
+
+  if (normalizedTag && validTags.includes(normalizedTag)) {
+    return normalizedTag as IssueTag;
+  }
+
+  return IssueTag.FEATURE;
+};
+
 export const createIssueService = async ({
   name,
   description,
   boardId,
   status,
+  tag,
 }: CreateIssueInput) => {
   const board = await prisma.board.findUnique({
     where: {
@@ -41,6 +54,7 @@ export const createIssueService = async ({
       description,
       boardId,
       status: normalizeIssueStatus(status),
+      tag: normalizeIssueTag(tag),
     },
   });
 };

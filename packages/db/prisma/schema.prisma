@@ -65,12 +65,27 @@ enum IssueStatus {
   DONE
 }
 
+enum IssueTag {
+  DESIGN
+  FRONTEND_CODING
+  BACKEND_CODING
+  MARKETING
+  PRODUCT
+  BUG
+  DOCUMENTATION
+  RESEARCH
+  TESTING
+  OPERATIONS
+  FEATURE
+}
+
 model Issue {
   id          String      @id @default(uuid())
   name        String
   description String
   boardId     String
   status      IssueStatus @default(UPCOMING)
+  tag         IssueTag    @default(FEATURE)
 
   // Relations
   board         Board          @relation(fields: [boardId], references: [id])

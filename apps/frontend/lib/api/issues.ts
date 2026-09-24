@@ -1,12 +1,13 @@
 import { ISSUE_API } from '@repo/config';
 import { apiRequest } from './client';
-import type { Issue, IssueStatus } from '../types';
+import type { Issue, IssueStatus, IssueTag } from '../types';
 
 export type CreateIssuePayload = {
   name: string;
   description: string;
   boardId: string;
   status: IssueStatus;
+  tag: IssueTag;
 };
 
 export async function listIssuesByBoard(boardId: string): Promise<Issue[]> {
