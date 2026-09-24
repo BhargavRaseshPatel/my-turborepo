@@ -1,6 +1,28 @@
 import { Request, Response } from "express";
-import { loginUser, createUserService } from "../services";
+import { loginUser, createUserService, getUserByIdService } from "../services";
 import { generateToken } from "../utils/jwt";
+
+export const getCurrentUser = async (req: Request, res: Response) => {
+    const userId = (req as any).userId;
+
+    if (!userId) {
+        return res.status(401).json({
+            message: "Authentication required",
+        });
+    }
+
+    const user = await getUserByIdService(userId);
+
+    if (!user) {
+        return res.status(404).json({
+            message: "User not found",
+        });
+    }
+
+    return res.status(200).json({
+        user,
+    });
+};
 
 export const getUser = async (req: Request, res: Response) => {
     const { email, password } = req.body

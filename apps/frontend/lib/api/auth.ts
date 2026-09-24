@@ -15,6 +15,16 @@ export type AuthResponse = {
   message?: string;
 };
 
+export type CurrentUser = {
+  id: string;
+  username: string;
+  email: string;
+};
+
+export function getCurrentUser() {
+  return apiRequest<{ user: CurrentUser }>(AUTH_API.me);
+}
+
 export function signIn(payload: SignInPayload) {
   return apiRequest<AuthResponse>(AUTH_API.signin, {
     method: 'POST',

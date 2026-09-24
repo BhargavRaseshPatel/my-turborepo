@@ -6,6 +6,7 @@ export const API_BASE_URL =
 export const AUTH_API = {
   signin: `${API_BASE_URL}/api/auth/signin`,
   signup: `${API_BASE_URL}/api/auth/signup`,
+  me: `${API_BASE_URL}/api/auth/me`,
 } as const;
 
 export const ORG_API = {

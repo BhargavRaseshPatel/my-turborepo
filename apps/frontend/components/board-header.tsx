@@ -1,6 +1,8 @@
 'use client';
 
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { getCurrentUser, type CurrentUser } from '@/lib/api/auth';
 
 export type BoardOption = {
   id: string;
@@ -24,6 +26,40 @@ export function BoardHeader({
   onProfileClick,
 }: BoardHeaderProps) {
   const router = useRouter();
+  const [user, setUser] = useState<CurrentUser | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadUser = async () => {
+      try {
+        const response = await getCurrentUser();
+        if (isMounted) {
+          setUser(response.user);
+        }
+      } catch {
+        if (isMounted) {
+          setUser(null);
+        }
+      }
+    };
+
+    loadUser();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const initials = useMemo(() => {
+    const username = user?.username ?? 'User';
+    return username
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? '')
+      .join('') || 'U';
+  }, [user]);
 
   const handleBoardChange = (nextBoardId: string) => {
     const nextBoard = boards.find((board) => board.id === nextBoardId);
@@ -66,10 +102,10 @@ export function BoardHeader({
         )}
 
         <button className="profile-menu-trigger" type="button" onClick={onProfileClick} aria-label="Open profile menu">
-          <span className="avatar">BP</span>
+          <span className="avatar">{initials}</span>
           <span className="board-profile">
-            <strong className="text-sm text-slate-900">Bhargav</strong>
-            <small className="text-[11px] text-slate-500">Account</small>
+            <strong className="text-sm text-slate-900">{user?.username ?? 'User'}</strong>
+            <small className="text-[11px] text-slate-500">{user?.email ?? 'Account'}</small>
           </span>
           <span className="text-slate-400" aria-hidden="true">⌄</span>
         </button>

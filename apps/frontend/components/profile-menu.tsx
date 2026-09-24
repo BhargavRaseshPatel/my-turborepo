@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { getCurrentUser, type CurrentUser } from '@/lib/api/auth';
 import { useAuth } from './auth-provider';
 
 type ProfileMenuProps = {
@@ -16,6 +17,40 @@ export function ProfileMenu({ isAdmin, organizationName, onAddMember }: ProfileM
   const [email, setEmail] = useState('');
   const [isAdding, setIsAdding] = useState(false);
   const [message, setMessage] = useState('');
+  const [user, setUser] = useState<CurrentUser | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadUser = async () => {
+      try {
+        const response = await getCurrentUser();
+        if (isMounted) {
+          setUser(response.user);
+        }
+      } catch {
+        if (isMounted) {
+          setUser(null);
+        }
+      }
+    };
+
+    loadUser();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const initials = useMemo(() => {
+    const username = user?.username ?? 'User';
+    return username
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? '')
+      .join('') || 'U';
+  }, [user]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -42,10 +77,10 @@ export function ProfileMenu({ isAdmin, organizationName, onAddMember }: ProfileM
   return (
     <aside className="profile-panel" aria-label="Profile information">
       <div className="profile-header">
-        <div className="avatar size-12 text-sm">BP</div>
+        <div className="avatar size-12 text-sm">{initials}</div>
         <div>
-          <strong className="block text-slate-900">Bhargav</strong>
-          <span className="profile-role">Product Lead</span>
+          <strong className="block text-slate-900">{user?.username ?? 'User'}</strong>
+          <span className="profile-role">{user?.email ?? 'Authenticated user'}</span>
         </div>
       </div>
       <div className="profile-details">
