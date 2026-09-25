@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { createBoard, listBoards } from '@/lib/api/boards';
-import { createOrganization, listOrganizations } from '@/lib/api/organizations';
+import { addOrganizationMember, createOrganization, listOrganizations } from '@/lib/api/organizations';
 import type { Board, Organization } from '@/lib/types';
 
 const getInitials = (name: string) => {
@@ -24,6 +24,8 @@ export default function DashboardPage() {
   const [formData, setFormData] = useState({ name: '', description: '' });
   const [boardFormData, setBoardFormData] = useState({ name: '' });
   const [allBoards, setAllBoards] = useState<Record<string, Board[]>>({});
+  const [memberEmail, setMemberEmail] = useState('');
+  const [isAddingMember, setIsAddingMember] = useState(false);
 
   const loadOrganizations = async () => {
     setIsLoading(true);
@@ -99,6 +101,32 @@ export default function DashboardPage() {
       alert(error instanceof Error ? error.message : 'Something went wrong');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleAddMember = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const email = memberEmail.trim();
+    if (!email || !selectedOrgId) return;
+
+    setIsAddingMember(true);
+
+    try {
+      const newMember = await addOrganizationMember(selectedOrgId, email);
+      setOrganizations((current) =>
+        current.map((organization) =>
+          String(organization.id) === String(selectedOrgId)
+            ? { ...organization, members: [...(organization.members ?? []), newMember] }
+            : organization
+        )
+      );
+      setMemberEmail('');
+    } catch (error) {
+      console.error(error);
+      alert(error instanceof Error ? error.message : 'Could not add member');
+    } finally {
+      setIsAddingMember(false);
     }
   };
 
@@ -233,6 +261,22 @@ export default function DashboardPage() {
                 {activeOrganization?.description || 'No description available.'}
               </p>
               <p className="mt-2 text-sm text-slate-500">Role: {activeOrganization?.role ?? 'Owner'}</p>
+
+              {activeOrganization?.role === 'admin' && (
+                <form className="mt-5 flex flex-col gap-2 sm:flex-row" onSubmit={handleAddMember}>
+                  <input
+                    type="email"
+                    className="member-input"
+                    value={memberEmail}
+                    onChange={(event) => setMemberEmail(event.target.value)}
+                    placeholder="Add member by email"
+                    aria-label="Member email"
+                  />
+                  <button type="submit" className="member-button" disabled={isAddingMember}>
+                    {isAddingMember ? 'Adding...' : 'Add member'}
+                  </button>
+                </form>
+              )}
 
               {activeOrganization?.members && activeOrganization.members.length > 0 && (
                 <div className="mt-5">
