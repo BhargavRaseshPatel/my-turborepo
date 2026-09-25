@@ -6,6 +6,12 @@ import { createBoard, listBoards } from '@/lib/api/boards';
 import { createOrganization, listOrganizations } from '@/lib/api/organizations';
 import type { Board, Organization } from '@/lib/types';
 
+const getInitials = (name: string) => {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  const letters = words.length > 1 ? words[0][0] + words[1][0] : name.slice(0, 2);
+  return letters.toUpperCase();
+};
+
 export default function DashboardPage() {
   const router = useRouter();
   const [organizations, setOrganizations] = useState<Organization[]>([]);
@@ -227,6 +233,25 @@ export default function DashboardPage() {
                 {activeOrganization?.description || 'No description available.'}
               </p>
               <p className="mt-2 text-sm text-slate-500">Role: {activeOrganization?.role ?? 'Owner'}</p>
+
+              {activeOrganization?.members && activeOrganization.members.length > 0 && (
+                <div className="mt-5">
+                  <p className="mb-2 text-sm font-semibold text-slate-500">Members ({activeOrganization.members.length})</p>
+                  <div className="flex flex-wrap gap-2">
+                    {[...activeOrganization.members]
+                      .sort((a, b) => (a.role === 'admin' ? -1 : b.role === 'admin' ? 1 : 0))
+                      .map((member) => (
+                        <div key={member.id} className="flex items-center gap-2 rounded-full bg-slate-100 py-1 pl-1 pr-3">
+                          <span className="assignee-avatar" title={member.email}>{getInitials(member.username)}</span>
+                          <span className="text-sm font-medium text-slate-800">{member.username}</span>
+                          <span className={member.role === 'admin' ? 'text-[11px] font-semibold text-indigo-600' : 'text-[11px] text-slate-500'}>
+                            {member.role === 'admin' ? 'Admin' : 'Member'}
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>

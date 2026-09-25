@@ -12,6 +12,7 @@
 
   html {
     background: #f8fafc;
+    scroll-behavior: smooth;
   }
 
   body {
@@ -19,6 +20,9 @@
     margin: 0;
     color: #0f172a;
     font-family: var(--font-geist-sans), sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   button,
@@ -26,6 +30,38 @@
   select,
   textarea {
     font: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  ::selection {
+    background: rgba(99, 102, 241, 0.22);
+    color: #1e1b4b;
+  }
+
+  /* Modern, unobtrusive scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border: 3px solid transparent;
+    background-clip: content-box;
+    border-radius: 9999px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+    background-clip: content-box;
   }
 }
 
@@ -39,27 +75,27 @@
   }
 
   .form-input {
-    @apply w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10;
+    @apply w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10;
   }
 
   .form-input-compact {
-    @apply w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10;
+    @apply w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10;
   }
 
   .button-primary {
-    @apply rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70;
+    @apply rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-indigo-600/25 transition hover:-translate-y-0.5 hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-600/30 active:translate-y-0 active:shadow-md disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0;
   }
 
   .button-secondary {
-    @apply rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50;
+    @apply rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 active:bg-slate-100;
   }
 
   .button-gradient {
-    @apply rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-3 font-bold text-white shadow-lg shadow-indigo-600/20 transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70;
+    @apply rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-3 font-bold text-white shadow-lg shadow-indigo-600/25 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-indigo-600/30 active:translate-y-0 active:shadow-md disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0;
   }
 
   .surface-card {
-    @apply rounded-2xl border border-slate-200 bg-white shadow-lg shadow-slate-900/5;
+    @apply rounded-2xl border border-slate-200/80 bg-white shadow-[0_10px_30px_-12px_rgba(15,23,42,0.15)];
   }
 
   .status-pill {
@@ -79,11 +115,11 @@
   }
 
   .auth-tab--active {
-    @apply bg-white text-blue-700 shadow-sm;
+    @apply bg-white text-indigo-700 shadow-sm;
   }
 
   .auth-submit-button {
-    @apply w-full rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3.5 font-extrabold tracking-wide text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-600/25;
+    @apply w-full rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-3.5 font-extrabold tracking-wide text-white shadow-lg shadow-indigo-600/25 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-indigo-600/30 active:translate-y-0 active:shadow-md;
   }
 
   .dropdown-label {
@@ -99,7 +135,7 @@
   }
 
   .issue-card {
-    @apply rounded-2xl border border-slate-200 bg-white p-3.5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md;
+    @apply rounded-2xl border border-slate-200 bg-white p-3.5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-lg hover:shadow-indigo-600/10;
   }
 
   .auth-page {
@@ -111,11 +147,11 @@
   }
 
   .brand-badge {
-    @apply inline-flex items-center gap-2.5 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-700;
+    @apply inline-flex items-center gap-2.5 rounded-full bg-indigo-50 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-indigo-700;
   }
 
   .brand-mark {
-    @apply grid size-[22px] place-items-center rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 text-xs font-extrabold text-white;
+    @apply grid size-[22px] place-items-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-xs font-extrabold text-white;
   }
 
   .auth-tabs {
@@ -127,7 +163,7 @@
   }
 
   .auth-link {
-    @apply ml-1.5 border-0 bg-transparent p-0 font-bold text-blue-700;
+    @apply ml-1.5 border-0 bg-transparent p-0 font-bold text-indigo-700 transition hover:text-indigo-800;
   }
 
   .setup-page {
@@ -139,7 +175,7 @@
   }
 
   .page-eyebrow {
-    @apply mb-2.5 text-xs font-extrabold uppercase tracking-wider text-blue-700;
+    @apply mb-2.5 text-xs font-extrabold uppercase tracking-wider text-indigo-700;
   }
 
   .page-heading {
@@ -167,15 +203,15 @@
   }
 
   .dashboard-select {
-    @apply min-w-52 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10;
+    @apply min-w-52 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-800 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10;
   }
 
   .board-card {
-    @apply cursor-pointer rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg;
+    @apply cursor-pointer rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-600/10;
   }
 
   .board-badge {
-    @apply rounded-full bg-blue-50 px-2 py-1 text-[11px] font-bold text-blue-700;
+    @apply rounded-full bg-indigo-50 px-2 py-1 text-[11px] font-bold text-indigo-700;
   }
 
   .profile-panel {
@@ -191,7 +227,7 @@
   }
 
   .demo-issue-card {
-    @apply rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md;
+    @apply rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-lg hover:shadow-indigo-600/10;
   }
 
   .demo-view-button {
