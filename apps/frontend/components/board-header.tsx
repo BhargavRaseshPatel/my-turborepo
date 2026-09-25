@@ -15,6 +15,7 @@ type BoardHeaderProps = {
   boardName: string;
   boardId: string;
   boards: BoardOption[];
+  liveCount: number;
   onProfileClick: () => void;
 };
 
@@ -23,6 +24,7 @@ export function BoardHeader({
   boardName,
   boardId,
   boards,
+  liveCount,
   onProfileClick,
 }: BoardHeaderProps) {
   const router = useRouter();
@@ -83,6 +85,19 @@ export function BoardHeader({
       </div>
 
       <div className="board-actions">
+        {liveCount > 0 && (
+          <span
+            className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-700"
+            title={`${liveCount} ${liveCount === 1 ? 'person is' : 'people are'} viewing this board`}
+          >
+            <span className="relative flex size-2.5">
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex size-2.5 rounded-full bg-emerald-500" />
+            </span>
+            {liveCount} live
+          </span>
+        )}
+
         {boards.length > 0 && (
           <label className="dropdown-label">
             <span className="hidden sm:inline">Board</span>

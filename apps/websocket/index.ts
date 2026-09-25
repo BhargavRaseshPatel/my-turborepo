@@ -10,6 +10,17 @@ const USERS: any = {
 
 }
 
+// Broadcast the live headcount (distinct users) of a board to everyone in it.
+const broadcastPresence = (boardId: string) => {
+    const room = USERS[boardId] ?? []
+    const count = new Set(room.map((u: any) => u.userId)).size
+    room.forEach(({ socket }: any) => socket.send(JSON.stringify({
+        type: "presence",
+        boardId,
+        count
+    })))
+}
+
 
 server.on("connection", (socket,) => {
     console.log("client connected")
@@ -41,6 +52,8 @@ server.on("connection", (socket,) => {
                 type: "initial_state",
                 users: USERS[boardId].filter((x: any) => x.userId != userId).map((u: any) => u.userId)
             }))
+
+            broadcastPresence(boardId)
         }
 
         if(parsedData.type == "add_issue"){
@@ -120,6 +133,8 @@ server.on("connection", (socket,) => {
                         type: "leave",
                         userId: userExists.userId
                     })))
+
+                    broadcastPresence(roomId)
                 }
 
             }

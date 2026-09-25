@@ -46,6 +46,7 @@ export default function OrganizationBoardPage({ params }: BoardDetailPageProps) 
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [formData, setFormData] = useState<IssueFormData>({ name: '', description: '', status: 'UPCOMING', tag: 'FEATURE', memberIds: [] });
     const [ws, setWs] = useState<WebSocket | null>(null);
+    const [liveCount, setLiveCount] = useState(0);
 
     useEffect(() => {
         const loadContext = async () => {
@@ -100,6 +101,10 @@ export default function OrganizationBoardPage({ params }: BoardDetailPageProps) 
 
             const parsedData = JSON.parse(data);
             const { type, issueId, status, tag, name, description } = parsedData
+
+            if (type == 'presence') {
+                setLiveCount(parsedData.count)
+            }
 
             if (type == 'issue_move') {
                 setIssues((prev) =>
@@ -199,7 +204,7 @@ const moveIssue = async (issueId: string, status: IssueStatus, direction: 'left'
 
     return (
         <main className="board-page">
-            <BoardHeader organizationName={organization?.name ?? 'Organization'} boardName={currentBoard?.name ?? 'Board'} boardId={boardId} boards={boards} onProfileClick={() => setIsProfileOpen((open) => !open)} />
+            <BoardHeader organizationName={organization?.name ?? 'Organization'} boardName={currentBoard?.name ?? 'Board'} boardId={boardId} boards={boards} liveCount={liveCount} onProfileClick={() => setIsProfileOpen((open) => !open)} />
             {isProfileOpen && <div className="profile-overlay"><div className="pointer-events-auto"><ProfileMenu isAdmin={isAdmin} organizationName={organization?.name ?? 'Organization'} onAddMember={handleAddMember} /></div></div>}
             {isIssueFormOpen ? (
                 <IssueCreateForm formData={formData} isSubmitting={isSubmitting} members={organization?.members ?? []} onChange={setFormData} onSubmit={handleCreateIssue} onCancel={() => setIsIssueFormOpen(false)} />
