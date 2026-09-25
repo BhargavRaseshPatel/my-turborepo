@@ -8,6 +8,7 @@ type CreateIssueInput = {
   boardId: string;
   status?: string;
   tag?: string;
+  memberIds?: string[];
 };
 
 const normalizeIssueStatus = (status?: string): IssueStatus => {
@@ -37,6 +38,7 @@ export const createIssueService = async ({
   boardId,
   status,
   tag,
+  memberIds,
 }: CreateIssueInput) => {
   const board = await prisma.board.findUnique({
     where: {
@@ -48,6 +50,8 @@ export const createIssueService = async ({
     throw new Error("Board not found");
   }
 
+  const uniqueMemberIds = [...new Set(memberIds ?? [])];
+
   return prisma.issue.create({
     data: {
       name,
@@ -55,6 +59,14 @@ export const createIssueService = async ({
       boardId,
       status: normalizeIssueStatus(status),
       tag: normalizeIssueTag(tag),
+      issueMappings: uniqueMemberIds.length
+        ? { create: uniqueMemberIds.map((userId) => ({ userId })) }
+        : undefined,
+    },
+    include: {
+      issueMappings: {
+        include: { user: { select: { id: true, username: true, email: true } } },
+      },
     },
   });
 };
@@ -73,6 +85,11 @@ export const getIssuesService = async (boardId: string) => {
   return prisma.issue.findMany({
     where: {
       boardId,
+    },
+    include: {
+      issueMappings: {
+        include: { user: { select: { id: true, username: true, email: true } } },
+      },
     },
   });
 };

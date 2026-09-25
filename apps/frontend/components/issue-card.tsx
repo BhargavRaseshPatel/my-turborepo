@@ -1,4 +1,5 @@
 import type { IssueFormData } from './issue-create-form';
+import type { OrganizationMember } from '../lib/types';
 
 type Issue = {
   id: string;
@@ -6,6 +7,7 @@ type Issue = {
   description: string;
   status?: IssueFormData['status'];
   tag: IssueFormData['tag'];
+  members?: OrganizationMember[];
 };
 
 type IssueCardProps = {
@@ -14,6 +16,12 @@ type IssueCardProps = {
   canMoveRight: boolean;
   onDelete: () => void;
   onMove: (direction: 'left' | 'right') => void;
+};
+
+const getInitials = (name: string) => {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  const letters = words.length > 1 ? words[0][0] + words[1][0] : name.slice(0, 2);
+  return letters.toUpperCase();
 };
 
 export function IssueCard({
@@ -36,6 +44,15 @@ export function IssueCard({
       </div>
       <h3 className="issue-card-title">{issue.name}</h3>
       <p className="issue-card-description">{issue.description}</p>
+      {issue.members && issue.members.length > 0 && (
+        <div className="assignee-stack mb-2">
+          {issue.members.map((member) => (
+            <span key={member.id} className="assignee-avatar" title={`${member.username} (${member.email})`}>
+              {getInitials(member.username)}
+            </span>
+          ))}
+        </div>
+      )}
       <div className="issue-card-actions">
         <button className="delete-issue-button" type="button" onClick={onDelete}>
           Delete

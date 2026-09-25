@@ -44,4 +44,5 @@ export type Issue = {
     status?: IssueStatus;
     tag: IssueTag;
     boardId: string;
+    members?: OrganizationMember[];
 };

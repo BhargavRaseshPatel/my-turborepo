@@ -44,7 +44,7 @@ export default function OrganizationBoardPage({ params }: BoardDetailPageProps) 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isIssueFormOpen, setIsIssueFormOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
-    const [formData, setFormData] = useState<IssueFormData>({ name: '', description: '', status: 'UPCOMING', tag: 'FEATURE' });
+    const [formData, setFormData] = useState<IssueFormData>({ name: '', description: '', status: 'UPCOMING', tag: 'FEATURE', memberIds: [] });
     const [ws, setWs] = useState<WebSocket | null>(null);
 
     useEffect(() => {
@@ -158,6 +158,7 @@ const moveIssue = async (issueId: string, status: IssueStatus, direction: 'left'
                 boardId,
                 status: formData.status,
                 tag: formData.tag,
+                memberIds: formData.memberIds,
             });
             setIssues((current) => current.some((issue) => issue.id === createdIssue.id)
                 ? current
@@ -167,7 +168,7 @@ const moveIssue = async (issueId: string, status: IssueStatus, direction: 'left'
                 type: 'add_issue',
                 createdIssue, issueId: createdIssue.id, boardId
             }))
-            setFormData({ name: '', description: '', status: 'UPCOMING', tag: 'FEATURE' });
+            setFormData({ name: '', description: '', status: 'UPCOMING', tag: 'FEATURE', memberIds: [] });
             setIsIssueFormOpen(false);
         } catch (error) {
             console.error('Could not create issue:', error);
@@ -201,7 +202,7 @@ const moveIssue = async (issueId: string, status: IssueStatus, direction: 'left'
             <BoardHeader organizationName={organization?.name ?? 'Organization'} boardName={currentBoard?.name ?? 'Board'} boardId={boardId} boards={boards} onProfileClick={() => setIsProfileOpen((open) => !open)} />
             {isProfileOpen && <div className="profile-overlay"><div className="pointer-events-auto"><ProfileMenu isAdmin={isAdmin} organizationName={organization?.name ?? 'Organization'} onAddMember={handleAddMember} /></div></div>}
             {isIssueFormOpen ? (
-                <IssueCreateForm formData={formData} isSubmitting={isSubmitting} onChange={setFormData} onSubmit={handleCreateIssue} onCancel={() => setIsIssueFormOpen(false)} />
+                <IssueCreateForm formData={formData} isSubmitting={isSubmitting} members={organization?.members ?? []} onChange={setFormData} onSubmit={handleCreateIssue} onCancel={() => setIsIssueFormOpen(false)} />
             ) : (
                 <div className="floating-action"><button className="button-gradient shadow-xl shadow-indigo-600/25" type="button" onClick={() => setIsIssueFormOpen(true)}>+ Add issue</button></div>
             )}

@@ -4,7 +4,7 @@ import { createIssueService, deleteIssueService, getIssuesService, updateIssueSt
 import { IssueStatus } from "../../../../packages/db/generated/prisma/enums";
 export const createIssue = async (req: Request, res: Response) => {
     try {
-        const { name, description, boardId, status, tag } = req.body;
+        const { name, description, boardId, status, tag, memberIds } = req.body;
         if (!name || !description || !boardId) {
             return res.status(400).json({
                 message: "Name, description, and boardId are required",
@@ -16,6 +16,7 @@ export const createIssue = async (req: Request, res: Response) => {
             boardId,
             status,
             tag,
+            memberIds: Array.isArray(memberIds) ? memberIds : [],
         });
         return res.status(201).json({
             message: "Issue created successfully",

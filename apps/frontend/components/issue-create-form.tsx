@@ -1,13 +1,14 @@
 'use client';
 
 import type { FormEvent } from 'react';
-import type { IssueTag } from '../lib/types';
+import type { IssueTag, OrganizationMember } from '../lib/types';
 
 export type IssueFormData = {
   name: string;
   description: string;
   status: 'UPCOMING' | 'IN_PROGRESS' | 'DONE';
   tag: IssueTag;
+  memberIds: string[];
 };
 
 const issueTagOptions: Array<{ value: IssueTag; label: string }> = [
@@ -27,6 +28,7 @@ const issueTagOptions: Array<{ value: IssueTag; label: string }> = [
 type IssueCreateFormProps = {
   formData: IssueFormData;
   isSubmitting: boolean;
+  members: OrganizationMember[];
   onChange: (formData: IssueFormData) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onCancel: () => void;
@@ -35,10 +37,18 @@ type IssueCreateFormProps = {
 export function IssueCreateForm({
   formData,
   isSubmitting,
+  members,
   onChange,
   onSubmit,
   onCancel,
 }: IssueCreateFormProps) {
+  const toggleMember = (memberId: string) => {
+    const selected = formData.memberIds.includes(memberId)
+      ? formData.memberIds.filter((id) => id !== memberId)
+      : [...formData.memberIds, memberId];
+    onChange({ ...formData, memberIds: selected });
+  };
+
   return (
     <section className="issue-modal-overlay" role="presentation" onMouseDown={onCancel}>
       <form
@@ -114,6 +124,27 @@ export function IssueCreateForm({
             rows={4}
             required
           />
+        </div>
+
+        <div className="mt-4">
+          <label className="form-label-compact">Assign members</label>
+          {members.length === 0 ? (
+            <p className="text-sm text-slate-500">No members in this organization yet.</p>
+          ) : (
+            <div className="flex max-h-40 flex-col gap-1 overflow-y-auto rounded-lg border border-slate-200 p-2">
+              {members.map((member) => (
+                <label key={member.id} className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-sm hover:bg-slate-50">
+                  <input
+                    type="checkbox"
+                    checked={formData.memberIds.includes(member.id)}
+                    onChange={() => toggleMember(member.id)}
+                  />
+                  <span className="font-medium text-slate-800">{member.username}</span>
+                  {member.email && <span className="text-slate-400">({member.email})</span>}
+                </label>
+              ))}
+            </div>
+          )}
         </div>
 
         <button className="button-gradient mt-5" type="submit" disabled={isSubmitting}>
