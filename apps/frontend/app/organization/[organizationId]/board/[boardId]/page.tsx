@@ -1,6 +1,7 @@
 'use client';
 
 import { use, useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { listBoards } from '../../../../../lib/api/boards';
 import { createIssue, deleteIssue, listIssuesByBoard, updateIssueStatus } from '../../../../../lib/api/issues';
 import { addOrganizationMember, listOrganizations } from '../../../../../lib/api/organizations';
@@ -37,6 +38,7 @@ const getTokenPayload = (): Record<string, string> => {
 
 export default function OrganizationBoardPage({ params }: BoardDetailPageProps) {
     const { organizationId, boardId } = use(params);
+    const router = useRouter();
     const [issues, setIssues] = useState<Issue[]>([]);
     const [organization, setOrganization] = useState<Organization>();
     const [boards, setBoards] = useState<BoardOption[]>([]);
@@ -52,7 +54,12 @@ export default function OrganizationBoardPage({ params }: BoardDetailPageProps) 
         const loadContext = async () => {
             try {
                 const [organizations, availableBoards] = await Promise.all([listOrganizations(), listBoards()]);
-                setOrganization(organizations.find((item: Organization) => String(item.id) === organizationId));
+                const currentOrg = organizations.find((item: Organization) => String(item.id) === organizationId);
+                if (!currentOrg) {
+                    router.replace('/dashboard');
+                    return;
+                }
+                setOrganization(currentOrg);
                 setBoards(availableBoards.map((board) => ({
                     id: String(board.id), name: board.name, organizationId: String(board.organizationId),
                 })));
