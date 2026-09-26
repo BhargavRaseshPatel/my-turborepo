@@ -6,6 +6,28 @@ collaboration. Built as a [Turborepo](https://turborepo.dev/) with three runnabl
 
 ---
 
+## Screenshots
+
+### Dashboard — organizations, members & boards
+
+Pick an organization, see its members (admin/member), add members by email, and manage boards.
+
+![Dashboard](docs/images/dashboard.webp)
+
+### Board — columns, issues & live presence
+
+Upcoming / In Progress / Done columns, move and delete issues, and a live viewer count.
+
+![Board](docs/images/board.webp)
+
+### Create issue — with member assignment
+
+Add an issue with a tag, status, description, and assign one or more organization members.
+
+![Create issue](docs/images/create-issue.webp)
+
+---
+
 ## Architecture at a glance
 
 ```
@@ -83,6 +105,24 @@ FRONTEND_CODING, BACKEND_CODING, MARKETING, PRODUCT, BUG, DOCUMENTATION, RESEARC
 OPERATIONS, FEATURE).
 
 ---
+
+> [!IMPORTANT]
+> **Heads up about the backend (hosted on Render's free tier).**
+> The backend is deployed on [Render](https://render.com/), and on the free plan a service
+> is **not always awake**:
+>
+> - **Cold start / waking up (~1 minute):** if no request has hit the backend recently, the
+>   first request has to wake the server and warm it up. This can take **up to a minute**.
+>   During this time API calls may seem slow or fail — this is expected. **Just wait ~1
+>   minute and try again**; once it's warm, everything responds normally.
+> - **Sleep mode after inactivity:** if the backend receives **no requests for a while**, Render
+>   automatically puts it to **sleep** to save resources. The next request wakes it back up,
+>   which triggers the ~1-minute cold start above.
+>
+> **What this means for you:** if the app looks stuck right after you open it (login, boards,
+> or issues not loading), the backend is most likely waking from sleep. Give it about a minute
+> and the calls will start working. This is a limitation of the free hosting tier, not a bug in
+> the app.
 
 ## Backend (`apps/backend`)
 
