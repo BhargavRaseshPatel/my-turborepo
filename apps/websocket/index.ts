@@ -21,6 +21,32 @@ const broadcastPresence = (boardId: string) => {
     })))
 }
 
+const removeTheUser = (socket: any, joinedRoom: string) => {
+    Object.entries(USERS).forEach(([roomId, users]: [any, any]) => {
+        if (roomId == joinedRoom) {
+            const userExists = users.find((u: any) => u.socket == socket)
+
+            if (userExists) {
+                // users = users.filter((x: any) => x.socket != socket);
+                USERS[roomId] = users.filter((x: any) => x.socket !== socket);
+
+                if (!USERS[roomId].length) {
+                    // console.log("yes")
+                    delete USERS[joinedRoom]
+                }
+
+                users.forEach(({ socket }: { socket: any }) => socket.send(JSON.stringify({
+                    type: "leave",
+                    userId: userExists.userId
+                })))
+
+                broadcastPresence(roomId)
+            }
+
+        }
+    })
+}
+
 
 server.on("connection", (socket,) => {
     console.log("client connected")
@@ -38,7 +64,7 @@ server.on("connection", (socket,) => {
             if (!USERS[boardId]) {
                 USERS[boardId] = []
             }
-            
+
             USERS[boardId].forEach(({ socket }: any) => socket.send(
                 JSON.stringify({
                     type: "join",
@@ -56,16 +82,20 @@ server.on("connection", (socket,) => {
             broadcastPresence(boardId)
         }
 
-        if(parsedData.type == "add_issue"){
-            const {boardId, issueId, createdIssue} = parsedData;
-            const {name, description, status, tag} =  createdIssue
+        if (parsedData.type == "leave") {
+            removeTheUser(socket, joinedRoom)
+        }
 
-            USERS[parsedData.createdIssue.boardId]?.forEach(({socket} : any) => socket.send(
+        if (parsedData.type == "add_issue") {
+            const { boardId, issueId, createdIssue } = parsedData;
+            const { name, description, status, tag } = createdIssue
+
+            USERS[parsedData.createdIssue.boardId]?.forEach(({ socket }: any) => socket.send(
                 JSON.stringify({
-                    type : 'add_issue',
-                     issueId,
-                    name : name,
-                    description : description,
+                    type: 'add_issue',
+                    issueId,
+                    name: name,
+                    description: description,
                     status: status,
                     tag: tag,
                     boardId
@@ -117,27 +147,14 @@ server.on("connection", (socket,) => {
             };
         }
 
-        console.log(USERS)
+        Object.entries(USERS).forEach(([roomID, users]: [any, any]) => {
+            console.log("RoomID :", roomID, ":", users.length)
+        })
+
+        // console.log(USERS)
     })
 
     socket.on("close", () => {
-        Object.entries(USERS).forEach(([roomId, users]: [any, any]) => {
-            if (roomId == joinedRoom) {
-                const userExists = users.find((u: any) => u.socket == socket)
-
-                if (userExists) {
-                    users = users.filter((x: any) => x.socket != socket);
-                    USERS[roomId] = users.filter((x: any) => x.socket !== socket);
-
-                    users.forEach(({ socket }: { socket: any }) => socket.send(JSON.stringify({
-                        type: "leave",
-                        userId: userExists.userId
-                    })))
-
-                    broadcastPresence(roomId)
-                }
-
-            }
-        })
+        removeTheUser(socket, joinedRoom)
     })
 })

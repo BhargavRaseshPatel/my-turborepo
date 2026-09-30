@@ -136,27 +136,39 @@ export default function OrganizationBoardPage({ params }: BoardDetailPageProps) 
 
     }, [])
 
-const moveIssue = async (issueId: string, status: IssueStatus, direction: 'left' | 'right') => {
-    const currentIndex = statusOrder.indexOf(status);
-    const nextIndex = direction === 'left' ? currentIndex - 1 : currentIndex + 1;
-    const nextStatus = statusOrder[nextIndex];
+    const moveIssue = async (issueId: string, status: IssueStatus, direction: 'left' | 'right') => {
+        const currentIndex = statusOrder.indexOf(status);
+        const nextIndex = direction === 'left' ? currentIndex - 1 : currentIndex + 1;
+        const nextStatus = statusOrder[nextIndex];
 
-    if (!nextStatus) return;
+        if (!nextStatus) return;
 
-    try {
-        await updateIssueStatus(issueId, nextStatus);
+        try {
+            await updateIssueStatus(issueId, nextStatus);
 
-        ws?.send(JSON.stringify({
-            type: 'issue_move',
-            issueId,
-            status,
-            direction,
-            boardId
-        }));
-    } catch (error) {
-        console.error('Could not move issue:', error);
+            ws?.send(JSON.stringify({
+                type: 'issue_move',
+                issueId,
+                status,
+                direction,
+                boardId
+            }));
+        } catch (error) {
+            console.error('Could not move issue:', error);
+        }
+    };
+
+    const leaveTheBoard = async() => {
+        try {
+
+            ws?.send(JSON.stringify({
+                type : 'leave',
+                boardId
+            }))
+        } catch (error) {
+            console.log("Could not able to leave the board", error)
+        }
     }
-};
 
 
     const handleCreateIssue = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -211,7 +223,7 @@ const moveIssue = async (issueId: string, status: IssueStatus, direction: 'left'
 
     return (
         <main className="board-page">
-            <BoardHeader organizationName={organization?.name ?? 'Organization'} boardName={currentBoard?.name ?? 'Board'} boardId={boardId} boards={boards} liveCount={liveCount} onProfileClick={() => setIsProfileOpen((open) => !open)} />
+            <BoardHeader leaveTheBoard={leaveTheBoard} organizationName={organization?.name ?? 'Organization'} boardName={currentBoard?.name ?? 'Board'} boardId={boardId} boards={boards} liveCount={liveCount} onProfileClick={() => setIsProfileOpen((open) => !open)} />
             {isProfileOpen && <div className="profile-overlay"><div className="pointer-events-auto"><ProfileMenu isAdmin={isAdmin} organizationName={organization?.name ?? 'Organization'} onAddMember={handleAddMember} /></div></div>}
             {isIssueFormOpen ? (
                 <IssueCreateForm formData={formData} isSubmitting={isSubmitting} members={organization?.members ?? []} onChange={setFormData} onSubmit={handleCreateIssue} onCancel={() => setIsIssueFormOpen(false)} />

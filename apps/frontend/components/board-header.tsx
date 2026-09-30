@@ -16,6 +16,7 @@ type BoardHeaderProps = {
   boardId: string;
   boards: BoardOption[];
   liveCount: number;
+  leaveTheBoard: () => void;
   onProfileClick: () => void;
 };
 
@@ -25,6 +26,7 @@ export function BoardHeader({
   boardId,
   boards,
   liveCount,
+  leaveTheBoard,
   onProfileClick,
 }: BoardHeaderProps) {
   const router = useRouter();
@@ -68,6 +70,7 @@ export function BoardHeader({
     if (nextBoard) {
       router.push(`/organization/${nextBoard.organizationId}/board/${nextBoard.id}`);
     }
+    leaveTheBoard()
   };
 
   return (
