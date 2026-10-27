@@ -17,7 +17,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    setIsAuthenticated(Boolean(localStorage.getItem('token')));
+    const token = localStorage.getItem('token');
+
+    const isExpired = !token || JSON.parse(atob(token.split('.')[1])).exp * 1000 < Date.now();
+    setIsAuthenticated(Boolean(!isExpired));
     setIsChecking(false);
   }, []);
 

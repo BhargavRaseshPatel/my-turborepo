@@ -49,7 +49,7 @@ const removeTheUser = (socket: any, joinedRoom: string) => {
 
 
 server.on("connection", (socket,) => {
-    console.log("client connected")
+    // console.log("client connected")
     let joinedRoom: string = ''
     let userId = ''
 
@@ -148,7 +148,7 @@ server.on("connection", (socket,) => {
         }
 
         Object.entries(USERS).forEach(([roomID, users]: [any, any]) => {
-            console.log("RoomID :", roomID, ":", users.length)
+            // console.log("RoomID :", roomID, ":", users.length)
         })
 
         // console.log(USERS)

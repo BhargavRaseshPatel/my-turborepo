@@ -9,12 +9,19 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token")!;
 
-    if (token) {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+
+    const isExpired = payload.exp * 1000 < Date.now();
+    console.log(isExpired)
+
+    if (!isExpired) {
       router.push("/dashboard");
+      console.log("0")
     }
     else {
+      console.log("1")
       router.push("/auth-screen")
     }
   }, []);

@@ -6,6 +6,7 @@ import {
   AuthToggleButton,
 } from "@/components/auth-form-controls";
 import { signIn, signUp } from "@/lib/api/auth";
+import { ApiError } from "@/lib/api/client";
 import { useAuth } from "@/components/auth-provider";
 import { useRouter } from "next/navigation";
 import { useState, type ChangeEvent, type FormEvent } from "react";
@@ -45,9 +46,33 @@ export default function AuthScreen() {
     }
   };
 
+  const handleDemoLogin = async () => {
+    const demo = { email: "demo@gmail.com", password: "Demo123456" };
+
+    try {
+      // First visit on a fresh database: create the demo user through the normal signup endpoint.
+      const data = await signIn(demo).catch((error) => {
+        if (error instanceof ApiError && error.status === 401) {
+          return signUp({ username: "Demo User", ...demo });
+        }
+        throw error;
+      });
+
+      if (data.token) {
+        login(data.token);
+      }
+
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Demo login error:", error);
+      alert(error instanceof Error ? error.message : "Something went wrong");
+    }
+  };
+
   return (
     <div className="auth-page">
       <div className="auth-card">
+
         <div className="brand-badge">
           <div className="brand-mark">T</div>
           <span>Trello</span>
@@ -123,6 +148,9 @@ export default function AuthScreen() {
           )}
 
           <AuthSubmitButton>{signInScreen ? "Sign In" : "Create Account"}</AuthSubmitButton>
+        <button type="button" style={{textTransform: 'uppercase'}} onClick={handleDemoLogin} className="auth-demo-button">
+           Try Demo Account
+        </button>
 
           <p className="auth-footer">
             {signInScreen ? "Don’t have an account?" : "Already have an account?"}{" "}
